@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ecom Profit Calculator</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; }
+  .left, .right { padding: 20px; overflow-y: auto; }
+  .left { width: 35%; border-right: 1px solid #ddd; background: #f9f9f9; }
+  .right { width: 65%; }
+  h2 { margin-top: 0; }
+  input { width: 100%; padding: 6px; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
+  th { background: #eee; }
+  .highlight { background: #e6ffe6; }
+  .metrics { display: flex; gap: 20px; }
+  .card { background: #f1f1f1; padding: 10px; border-radius: 8px; flex: 1; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="left">
+  <h2>Inputs</h2>
+
+  <h3>Product</h3>
+  <label>Price per unit</label>
+  <input id="price" value="7.99">
+
+  <label>Single unit cost (3x3)</label>
+  <input id="costSingle" value="3.10">
+
+  <label>Batch cost (6x6)</label>
+  <input id="costBatch" value="4.32">
+
+  <label>Batch size</label>
+  <input id="batchSize" value="4">
+
+  <h3>Shipping</h3>
+  <label>Customer shipping price</label>
+  <input id="shipCustomer" value="4.99">
+
+  <label>Free shipping threshold</label>
+  <input id="freeShip" value="30">
+
+  <label>Your shipping (first item)</label>
+  <input id="shipFirst" value="5.09">
+
+  <label>Your shipping (additional)</label>
+  <input id="shipExtra" value="0.07">
+
+  <h3>Ads</h3>
+  <label>CPA</label>
+  <input id="cpa" value="20">
+</div>
+
+<div class="right">
+  <h2>Results</h2>
+
+  <div class="metrics">
+    <div class="card">
+      <div>Break-even CPA</div>
+      <div id="breakEven">-</div>
+    </div>
+    <div class="card">
+      <div>Profit @ CPA</div>
+      <div id="profitCPA">-</div>
+    </div>
+  </div>
+
+  <table id="table">
+    <thead>
+      <tr>
+        <th>Qty</th>
+        <th>Revenue</th>
+        <th>Cost</th>
+        <th>Profit</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+function calcBatchCost(n, costSingle, costBatch, batchSize) {
+  let batches = Math.floor(n / batchSize);
+  let remainder = n % batchSize;
+  let cost = batches * costBatch;
+
+  if (remainder === 1) cost += costSingle;
+  else if (remainder > 1) cost += costBatch;
+
+  return cost;
+}
+
+function update() {
+  let price = parseFloat(document.getElementById("price").value);
+  let costSingle = parseFloat(document.getElementById("costSingle").value);
+  let costBatch = parseFloat(document.getElementById("costBatch").value);
+  let batchSize = parseInt(document.getElementById("batchSize").value);
+
+  let shipCustomer = parseFloat(document.getElementById("shipCustomer").value);
+  let freeShip = parseFloat(document.getElementById("freeShip").value);
+
+  let shipFirst = parseFloat(document.getElementById("shipFirst").value);
+  let shipExtra = parseFloat(document.getElementById("shipExtra").value);
+
+  let cpa = parseFloat(document.getElementById("cpa").value);
+
+  let tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
+
+  let bestProfit = -Infinity;
+  let breakEvenCPA = 0;
+
+  for (let n = 1; n <= 24; n++) {
+    let productCost = calcBatchCost(n, costSingle, costBatch, batchSize);
+    let shippingCost = shipFirst + (n - 1) * shipExtra;
+
+    let chargedQty = n - Math.floor(n / 4);
+    let goodsRevenue = chargedQty * price;
+
+    let shippingRevenue = goodsRevenue >= freeShip ? 0 : shipCustomer;
+    let revenue = goodsRevenue + shippingRevenue;
+
+    let totalCost = productCost + shippingCost;
+    let profit = revenue - totalCost;
+
+    if (profit > bestProfit) bestProfit = profit;
+    if (n === 6) breakEvenCPA = profit;
+
+    let row = `<tr class="${profit === bestProfit ? 'highlight' : ''}">
+      <td>${n}</td>
+      <td>${revenue.toFixed(2)}</td>
+      <td>${totalCost.toFixed(2)}</td>
+      <td>${profit.toFixed(2)}</td>
+    </tr>`;
+
+    tbody.innerHTML += row;
+  }
+
+  document.getElementById("breakEven").innerText = "$" + breakEvenCPA.toFixed(2);
+  document.getElementById("profitCPA").innerText = "$" + (breakEvenCPA - cpa).toFixed(2);
+}
+
+document.querySelectorAll("input").forEach(input => {
+  input.addEventListener("input", update);
+});
+
+update();
+</script>
+
+</body>
+</html>

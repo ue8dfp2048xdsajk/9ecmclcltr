@@ -49,7 +49,65 @@
     <option value="batch">Batch Production (e.g. sticker sheets)</option>
   </select>
 
-  <h3>Shipping</h3>
+  
+  <h3>Customer Discounts</h3>
+
+
+<label>Buy X Get Y</label>
+<input id="custBX" placeholder="Buy X">
+<input id="custBY" placeholder="Get Y">
+<select id="custBXYType">
+  <option value="free">Free</option>
+  <option value="percent">% Off</option>
+  <option value="fixed">Amount Off Each</option>
+</select>
+<input id="custBXYValue" placeholder="Value">
+
+<label>Discount Type</label>
+<select id="custDiscountType">
+  <option value="none">None</option>
+  <option value="percent">% Discount</option>
+  <option value="fixed">Fixed Discount</option>
+</select>
+<input id="custDiscountValue" placeholder="Value">
+
+<label>Minimum Requirement</label>
+<select id="custMinType">
+  <option value="none">None</option>
+  <option value="quantity">Minimum Quantity</option>
+  <option value="amount">Minimum Amount</option>
+</select>
+<input id="custMinValue" placeholder="Value">
+
+  <h3>Supplier Discounts</h3>
+
+
+<label>Buy X Get Y</label>
+<input id="suppBX" placeholder="Buy X">
+<input id="suppBY" placeholder="Get Y">
+<select id="suppBXYType">
+  <option value="free">Free</option>
+  <option value="percent">% Off</option>
+  <option value="fixed">Amount Off Each</option>
+</select>
+<input id="suppBXYValue" placeholder="Value">
+
+<label>Discount Type</label>
+<select id="suppDiscountType">
+  <option value="none">None</option>
+  <option value="percent">% Discount</option>
+  <option value="fixed">Fixed Discount</option>
+</select>
+<input id="suppDiscountValue" placeholder="Value">
+
+<label>Minimum Requirement</label>
+<select id="suppMinType">
+  <option value="none">None</option>
+  <option value="quantity">Minimum Quantity</option>
+  <option value="amount">Minimum Amount</option>
+</select>
+<input id="suppMinValue" placeholder="Value">
+<h3>Shipping</h3>
   <label>Customer shipping price</label>
   <input id="shipCustomer" value="4.99">
 
@@ -71,9 +129,15 @@
 <div class="right">
   <h2>Results</h2>
 
+  
+<div style="margin-top:10px;">
+  <label>Selected Quantity</label>
+  <input id="selectedQty" type="number" min="1" max="24" value="6">
+</div>
+
   <div class="metrics">
     <div class="card">
-      <div>Break-even CPA</div>
+      <div>Max CPA (Break-even)</div>
       <div id="breakEven">-</div>
     </div>
     <div class="card">
@@ -81,7 +145,7 @@
       <div id="breakEvenROAS">-</div>
     </div>
     <div class="card">
-      <div>Profit @ CPA</div>
+      <div>Profit at CPA</div>
       <div id="profitCPA">-</div>
     </div>
   </div>
@@ -126,6 +190,15 @@ function calcBatchCost(n, costSingle, costBatch, batchSize) {
   return cost;
 }
 
+
+function handleVisibility() {
+  let custType = document.getElementById("custBXYType").value;
+  document.getElementById("custBXYValue").style.display = custType === "free" ? "none" : "block";
+
+  let suppType = document.getElementById("suppBXYType").value;
+  document.getElementById("suppBXYValue").style.display = suppType === "free" ? "none" : "block";
+}
+
 function update() {
   let price = parseFloat(document.getElementById("price").value);
   let costSingle = parseFloat(document.getElementById("costSingle").value);
@@ -148,22 +221,106 @@ function update() {
   let breakEvenROAS = 0;
 
   for (let n = 1; n <= 24; n++) {
+    
     let productCost = calcBatchCost(n, costSingle, costBatch, batchSize);
+
+    // SUPPLIER DISCOUNTS
+    let suppBX = parseFloat(document.getElementById("suppBX").value) || 0;
+    let suppBY = parseFloat(document.getElementById("suppBY").value) || 0;
+    let suppBXYType = document.getElementById("suppBXYType").value;
+    let suppBXYValue = parseFloat(document.getElementById("suppBXYValue").value) || 0;
+
+    let suppDiscountType = document.getElementById("suppDiscountType").value;
+    let suppDiscountValue = parseFloat(document.getElementById("suppDiscountValue").value) || 0;
+
+    let suppMinType = document.getElementById("suppMinType").value;
+    let suppMinValue = parseFloat(document.getElementById("suppMinValue").value) || 0;
+
+    let meetsMinSupp = true;
+    if (suppMinType === "quantity") meetsMinSupp = n >= suppMinValue;
+    if (suppMinType === "amount") meetsMinSupp = productCost >= suppMinValue;
+
+    if (meetsMinSupp && suppBX > 0 && suppBY > 0) {
+      let groups = Math.floor(n / (suppBX + suppBY));
+      let discountUnits = groups * suppBY;
+      let unitCostApprox = productCost / n;
+
+      if (suppBXYType === "free") {
+        productCost -= discountUnits * unitCostApprox;
+      } else if (suppBXYType === "percent") {
+        productCost -= discountUnits * unitCostApprox * (suppBXYValue / 100);
+      } else if (suppBXYType === "fixed") {
+        productCost -= discountUnits * suppBXYValue;
+      }
+    }
+
+    if (meetsMinSupp) {
+      if (suppDiscountType === "percent") {
+        productCost *= (1 - suppDiscountValue / 100);
+      } else if (suppDiscountType === "fixed") {
+        productCost = Math.max(0, productCost - suppDiscountValue);
+      }
+    }
+
     let shippingCost = shipFirst + (n - 1) * shipExtra;
 
+    
+    // CUSTOMER DISCOUNTS
+    let custBX = parseFloat(document.getElementById("custBX").value) || 0;
+    let custBY = parseFloat(document.getElementById("custBY").value) || 0;
+    let custBXYType = document.getElementById("custBXYType").value;
+    let custBXYValue = parseFloat(document.getElementById("custBXYValue").value) || 0;
+
+    let custDiscountType = document.getElementById("custDiscountType").value;
+    let custDiscountValue = parseFloat(document.getElementById("custDiscountValue").value) || 0;
+
+    let custMinType = document.getElementById("custMinType").value;
+    let custMinValue = parseFloat(document.getElementById("custMinValue").value) || 0;
+
     let chargedQty = n;
-    let goodsRevenue = chargedQty * price;
+    let goodsRevenue = n * price;
+
+    // Check minimums
+    let meetsMin = true;
+    if (custMinType === "quantity") meetsMin = n >= custMinValue;
+    if (custMinType === "amount") meetsMin = goodsRevenue >= custMinValue;
+
+    if (meetsMin && custBX > 0 && custBY > 0) {
+      let groups = Math.floor(n / (custBX + custBY));
+      let discountUnits = groups * custBY;
+
+      if (custBXYType === "free") {
+        chargedQty = n - discountUnits;
+        goodsRevenue = chargedQty * price;
+      } else if (custBXYType === "percent") {
+        goodsRevenue -= discountUnits * price * (custBXYValue / 100);
+      } else if (custBXYType === "fixed") {
+        goodsRevenue -= discountUnits * custBXYValue;
+      }
+    }
+
+    if (meetsMin) {
+      if (custDiscountType === "percent") {
+        goodsRevenue *= (1 - custDiscountValue / 100);
+      } else if (custDiscountType === "fixed") {
+        goodsRevenue = Math.max(0, goodsRevenue - custDiscountValue);
+      }
+    }
+
 
     let freeShipEnabled = document.getElementById("freeShipToggle").checked;
     let shippingRevenue = (freeShipEnabled && goodsRevenue >= freeShip) ? 0 : shipCustomer;
+    goodsRevenue = Math.max(0, goodsRevenue);
     let revenue = goodsRevenue + shippingRevenue;
 
+    productCost = Math.max(0, productCost);
     let totalCost = productCost + shippingCost;
     let profit = revenue - totalCost;
     let currentROAS = profit > 0 ? revenue / profit : 0;
 
     if (profit > bestProfit) bestProfit = profit;
-    if (n === 6) {
+    let selectedQty = parseInt(document.getElementById("selectedQty").value) || 1;
+    if (n === selectedQty) {
       breakEvenCPA = profit;
       breakEvenROAS = currentROAS;
     }
@@ -188,9 +345,11 @@ function update() {
 }
 
 document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("change", handleVisibility);
   el.addEventListener("input", update);
 });
 
+handleVisibility();
 update();
 </script>
 

@@ -14,6 +14,8 @@
   th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
   th { background: #eee; }
   .highlight { background: #e6ffe6; }
+  .greenCol { background: #e6ffe6; }
+  td { background: white; }
   .metrics { display: flex; gap: 20px; }
   .card { background: #f1f1f1; padding: 10px; border-radius: 8px; flex: 1; text-align: center; }
 </style>
@@ -30,17 +32,29 @@
   <label>Single unit cost</label>
   <input id="costSingle" value="3.10">
 
-  <label>Batch cost</label>
-  <input id="costBatch" value="4.32">
+  <div style="display:flex; gap:10px;">
+    <div style="flex:1;">
+      <label>Batch cost</label>
+      <input id="costBatch" value="4.32">
+    </div>
+    <div style="flex:1;">
+      <label>Batch size</label>
+      <input id="batchSize" value="4">
+    </div>
+  </div>
 
-  <label>Batch size</label>
-  <input id="batchSize" value="4">
+  <label>Pricing Model</label>
+  <select id="pricingModel">
+    <option value="unit">Per Unit Pricing</option>
+    <option value="batch">Batch Production (e.g. sticker sheets)</option>
+  </select>
 
   <h3>Shipping</h3>
   <label>Customer shipping price</label>
   <input id="shipCustomer" value="4.99">
 
   <label>Free shipping threshold</label>
+  <label><input type="checkbox" id="freeShipToggle" checked> Enable Free Shipping</label>
   <input id="freeShip" value="30">
 
   <label>Your shipping (first item)</label>
@@ -63,6 +77,10 @@
       <div id="breakEven">-</div>
     </div>
     <div class="card">
+      <div>Break-even ROAS</div>
+      <div id="breakEvenROAS">-</div>
+    </div>
+    <div class="card">
       <div>Profit @ CPA</div>
       <div id="profitCPA">-</div>
     </div>
@@ -71,10 +89,14 @@
   <table id="table">
     <thead>
       <tr>
-        <th>Qty</th>
-        <th>Revenue</th>
-        <th>Cost</th>
-        <th>Profit</th>
+        <th style="color:black;">Quantity</th>
+        <th style="color:green;">Item Revenue</th>
+        <th style="color:green;">Shipping Revenue</th>
+        <th style="color:green;">Total Revenue</th>
+        <th style="color:red;">Item Cost</th>
+        <th style="color:red;">Shipping Cost</th>
+        <th style="color:red;">Total Cost (COGS + Shipping)</th>
+        <th style="color:green;">Profit</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -83,6 +105,17 @@
 
 <script>
 function calcBatchCost(n, costSingle, costBatch, batchSize) {
+  let model = document.getElementById("pricingModel").value;
+
+  // Per unit pricing
+  if (model === "unit") {
+    if (n < batchSize) return n * costSingle;
+    let batches = Math.floor(n / batchSize);
+    let remainder = n % batchSize;
+    return batches * costBatch + remainder * costSingle;
+  }
+
+  // Batch production (stickers etc.)
   let batches = Math.floor(n / batchSize);
   let remainder = n % batchSize;
   let cost = batches * costBatch;
@@ -112,28 +145,38 @@ function update() {
 
   let bestProfit = -Infinity;
   let breakEvenCPA = 0;
+  let breakEvenROAS = 0;
 
   for (let n = 1; n <= 24; n++) {
     let productCost = calcBatchCost(n, costSingle, costBatch, batchSize);
     let shippingCost = shipFirst + (n - 1) * shipExtra;
 
-    let chargedQty = n - Math.floor(n / 4);
+    let chargedQty = n;
     let goodsRevenue = chargedQty * price;
 
-    let shippingRevenue = goodsRevenue >= freeShip ? 0 : shipCustomer;
+    let freeShipEnabled = document.getElementById("freeShipToggle").checked;
+    let shippingRevenue = (freeShipEnabled && goodsRevenue >= freeShip) ? 0 : shipCustomer;
     let revenue = goodsRevenue + shippingRevenue;
 
     let totalCost = productCost + shippingCost;
     let profit = revenue - totalCost;
+    let currentROAS = profit > 0 ? revenue / profit : 0;
 
     if (profit > bestProfit) bestProfit = profit;
-    if (n === 6) breakEvenCPA = profit;
+    if (n === 6) {
+      breakEvenCPA = profit;
+      breakEvenROAS = currentROAS;
+    }
 
     let row = `<tr class="${profit === bestProfit ? 'highlight' : ''}">
       <td>${n}</td>
-      <td>${revenue.toFixed(2)}</td>
-      <td>${totalCost.toFixed(2)}</td>
-      <td>${profit.toFixed(2)}</td>
+      <td>${goodsRevenue.toFixed(2)}</td>
+      <td>${shippingRevenue.toFixed(2)}</td>
+      <td class="greenCol">${revenue.toFixed(2)}</td>
+      <td>${productCost.toFixed(2)}</td>
+      <td>${shippingCost.toFixed(2)}</td>
+      <td style="background:#ffe6e6;">${totalCost.toFixed(2)}</td>
+      <td class="greenCol">${profit.toFixed(2)}</td>
     </tr>`;
 
     tbody.innerHTML += row;
@@ -141,10 +184,11 @@ function update() {
 
   document.getElementById("breakEven").innerText = "$" + breakEvenCPA.toFixed(2);
   document.getElementById("profitCPA").innerText = "$" + (breakEvenCPA - cpa).toFixed(2);
+  document.getElementById("breakEvenROAS").innerText = breakEvenROAS.toFixed(2) + "x";
 }
 
-document.querySelectorAll("input").forEach(input => {
-  input.addEventListener("input", update);
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("input", update);
 });
 
 update();

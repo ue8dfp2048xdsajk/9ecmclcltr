@@ -173,6 +173,7 @@
         <th style="color:red;">Total Cost (COGS + Shipping)</th>
         <th style="color:red;">Platform Fees</th>
         <th style="color:green;">Profit</th>
+        <th style="color:green;">Profit After Ads</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -337,6 +338,7 @@ function update() {
     productCost = Math.max(0, productCost);
     let totalCost = productCost + shippingCost;
     let profit = revenue - totalCost - totalFees;
+    let profitAfterAds = profit - cpa;
     let currentROAS = profit > 0 ? revenue / profit : 0;
 
     if (profit > bestProfit) bestProfit = profit;
@@ -356,6 +358,7 @@ function update() {
       <td style="background:#ffe6e6;">${totalCost.toFixed(2)}</td>
       <td style="background:#ffe6e6;">${totalFees.toFixed(2)}</td>
       <td class="greenCol">${profit.toFixed(2)}</td>
+      <td class="greenCol">${profitAfterAds.toFixed(2)}</td>
     </tr>`;
 
     tbody.innerHTML += row;

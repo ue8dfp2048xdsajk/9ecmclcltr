@@ -121,7 +121,18 @@
   <label>Your shipping (additional)</label>
   <input id="shipExtra" value="0.07">
 
-  <h3>Ads</h3>
+  
+<h3>Fees</h3>
+<label>Platform fee (%)</label>
+<input id="platformFeePercent" placeholder="e.g. 2.9">
+
+<label>Fixed fee per order</label>
+<input id="fixedFee" placeholder="e.g. 0.30">
+
+<label>Payment processor fee (%)</label>
+<input id="processorFeePercent" placeholder="e.g. 2.9">
+
+<h3>Ads</h3>
   <label>CPA</label>
   <input id="cpa" value="20">
 </div>
@@ -160,6 +171,7 @@
         <th style="color:red;">Item Cost</th>
         <th style="color:red;">Shipping Cost</th>
         <th style="color:red;">Total Cost (COGS + Shipping)</th>
+        <th style="color:red;">Platform Fees</th>
         <th style="color:green;">Profit</th>
       </tr>
     </thead>
@@ -313,9 +325,18 @@ function update() {
     goodsRevenue = Math.max(0, goodsRevenue);
     let revenue = goodsRevenue + shippingRevenue;
 
+    // PLATFORM FEES
+    let platformPercent = parseFloat(document.getElementById("platformFeePercent").value) || 0;
+    let processorPercent = parseFloat(document.getElementById("processorFeePercent").value) || 0;
+    let fixedFee = parseFloat(document.getElementById("fixedFee").value) || 0;
+
+    let percentFees = revenue * (platformPercent / 100) + revenue * (processorPercent / 100);
+    let totalFees = percentFees + fixedFee;
+
+
     productCost = Math.max(0, productCost);
     let totalCost = productCost + shippingCost;
-    let profit = revenue - totalCost;
+    let profit = revenue - totalCost - totalFees;
     let currentROAS = profit > 0 ? revenue / profit : 0;
 
     if (profit > bestProfit) bestProfit = profit;
@@ -333,6 +354,7 @@ function update() {
       <td>${productCost.toFixed(2)}</td>
       <td>${shippingCost.toFixed(2)}</td>
       <td style="background:#ffe6e6;">${totalCost.toFixed(2)}</td>
+      <td style="background:#ffe6e6;">${totalFees.toFixed(2)}</td>
       <td class="greenCol">${profit.toFixed(2)}</td>
     </tr>`;
 

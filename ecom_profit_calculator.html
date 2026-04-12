@@ -68,101 +68,76 @@
   <h3>Product</h3>
   <label>Price per unit</label>
   <input id="price" value="7.99">
-
   <label>Single unit cost</label>
   <input id="costSingle" value="3.10">
 
-  <h3>Customer Discounts</h3>
-<div id="customerDiscountsContainer"></div>
-<button onclick="addCustomerDiscount()">+ Add Customer Discount</button>
-
-
-
-
-  <h3>Supplier Discounts</h3>
-<div id="supplierDiscountsContainer"></div>
-
-<label><input type="checkbox" id="enableBatch"> Enable Batch Pricing</label>
-<div id="batchContainer" style="display:none;">
-  <div style="display:flex; gap:10px;">
-    <div style="flex:1;">
-      <label>Batch cost</label>
-      <input id="costBatch" value="4.32">
-    </div>
-    <div style="flex:1;">
-      <label>Batch size</label>
-      <input id="batchSize" value="4">
-    </div>
-  </div>
-
-  <label>Pricing Model</label>
-  <select id="pricingModel">
-    <option value="unit">Per Unit Pricing</option>
-    <option value="batch">Batch Production</option>
-  </select>
-</div>
-<button onclick="addSupplierDiscount()">+ Add Supplier Discount</button>
-
-
-
-<h3>Shipping</h3>
+  <h3>Shipping</h3>
   <label>Customer shipping price (first item)</label>
   <input id="shipCustomerFirst" value="4.99">
-
   <label>Customer shipping price (additional items)</label>
   <input id="shipCustomerExtra" value="0.00">
-
   <label><input type="checkbox" id="freeShipToggle" checked> Enable Free Shipping</label>
   <div id="freeShipContainer">
     <label>Free Shipping Threshold Amount</label>
     <input id="freeShip" value="30">
   </div>
-
   <label>Your shipping (first item)</label>
   <input id="shipFirst" value="5.09">
-
   <label>Your shipping (additional)</label>
   <input id="shipExtra" value="0.07">
 
-  
-<h3>Fees</h3>
-<label>Platform fee (%)</label>
-<input id="platformFeePercent" placeholder="e.g. 2.9">
+  <h3>Fees</h3>
+  <label>Platform fee (%)</label>
+  <input id="platformFeePercent" placeholder="e.g. 2.9">
+  <label>Fixed fee per order</label>
+  <input id="fixedFee" placeholder="e.g. 0.30">
+  <label>Payment processor fee (%)</label>
+  <input id="processorFeePercent" placeholder="e.g. 2.9">
+  <label>Fulfilment & storage cost per unit</label>
+  <input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
 
-<label>Fixed fee per order</label>
-<input id="fixedFee" placeholder="e.g. 0.30">
+  <h3>Tax</h3>
+  <label>Tax rate (%)</label>
+  <input id="taxRate" value="20">
+  <label><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
+  <label><input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax</label>
 
-<label>Payment processor fee (%)</label>
-<input id="processorFeePercent" placeholder="e.g. 2.9">
-
-<label>Fulfilment & storage cost per unit 
-<span class="tooltip" style="color:gray;">ⓘ
-  <span class="tooltiptext">
-    Enter your fulfilment + storage cost per unit.<br>
-    Find this from your fulfilment provider.<br><br>
-    Amazon FBA: https://sellercentral.amazon.com/revcal
-  </span>
-</span>
-</label>
-<input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
-
-
-<h3>Tax</h3>
-<label>Tax rate (%)</label>
-<input id="taxRate" value="20">
-
-<label><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
-<label><input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax</label>
-
-<h3>Ads</h3>
-
+  <h3>Ads</h3>
   <label>Estimated CPA</label>
   <input id="cpa" value="20">
   <label>Estimated Quantity Bought</label>
   <input id="selectedQty" type="number" min="1" max="24" value="6">
 
-</div>
+  <h3>Customer Discounts</h3>
+  <div id="customerDiscountsContainer"></div>
+  <button onclick="addCustomerDiscount()">+ Add Customer Discount</button>
 
+  <h3>Supplier Discounts</h3>
+  <div id="supplierDiscountsContainer"></div>
+
+  <label><input type="checkbox" id="enableBatch"> Enable Batch Pricing</label>
+  <div id="batchContainer" style="display:none;">
+    <div style="display:flex; gap:10px;">
+      <div style="flex:1;">
+        <label>Batch cost</label>
+        <input id="costBatch" value="4.32">
+      </div>
+      <div style="flex:1;">
+        <label>Batch size</label>
+        <input id="batchSize" value="4">
+      </div>
+    </div>
+
+    <label>Pricing Model</label>
+    <select id="pricingModel">
+      <option value="unit">Per Unit Pricing</option>
+      <option value="batch">Batch Production</option>
+    </select>
+  </div>
+
+  <button onclick="addSupplierDiscount()">+ Add Supplier Discount</button>
+
+</div>
 <div class="right">
   <h2>Results</h2>
 

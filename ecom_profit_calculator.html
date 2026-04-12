@@ -104,12 +104,17 @@
 
 
 <h3>Shipping</h3>
-  <label>Customer shipping price</label>
-  <input id="shipCustomer" value="4.99">
+  <label>Customer shipping price (first item)</label>
+  <input id="shipCustomerFirst" value="4.99">
 
-  <label>Free shipping threshold</label>
+  <label>Customer shipping price (additional items)</label>
+  <input id="shipCustomerExtra" value="0.00">
+
   <label><input type="checkbox" id="freeShipToggle" checked> Enable Free Shipping</label>
-  <input id="freeShip" value="30">
+  <div id="freeShipContainer">
+    <label>Free Shipping Threshold Amount</label>
+    <input id="freeShip" value="30">
+  </div>
 
   <label>Your shipping (first item)</label>
   <input id="shipFirst" value="5.09">
@@ -219,7 +224,13 @@ function calcBatchCost(n, costSingle, costBatch, batchSize) {
 }
 
 
-function handleVisibility() {}
+function handleVisibility() {
+  let toggle = document.getElementById("freeShipToggle");
+  let container = document.getElementById("freeShipContainer");
+  if (!toggle || !container) return;
+
+  container.style.display = toggle.checked ? "block" : "none";
+}
 
 function update() {
   let price = parseFloat(document.getElementById("price").value);
@@ -227,7 +238,8 @@ function update() {
   let costBatch = parseFloat(document.getElementById("costBatch").value);
   let batchSize = parseInt(document.getElementById("batchSize").value);
 
-  let shipCustomer = parseFloat(document.getElementById("shipCustomer").value);
+  let shipCustomerFirst = parseFloat(document.getElementById("shipCustomerFirst").value);
+  let shipCustomerExtra = parseFloat(document.getElementById("shipCustomerExtra").value);
   let freeShip = parseFloat(document.getElementById("freeShip").value);
 
   let shipFirst = parseFloat(document.getElementById("shipFirst").value);
@@ -307,7 +319,7 @@ function update() {
     let chargedQty = n;
     let goodsRevenue = n * price;
 
-    let revenueBeforeDiscounts = (n * price) + shipCustomer;
+    let revenueBeforeDiscounts = (n * price) + (shipCustomerFirst + (n - 1) * shipCustomerExtra);
 
     // Build customer discounts array
     let customerDiscounts = [];
@@ -365,7 +377,7 @@ function update() {
     }
 
     let freeShipEnabled = document.getElementById("freeShipToggle").checked;
-    let shippingRevenue = (freeShipEnabled && goodsRevenue >= freeShip) ? 0 : shipCustomer;
+    let shippingRevenue = (freeShipEnabled && goodsRevenue >= freeShip) ? 0 : (shipCustomerFirst + (n - 1) * shipCustomerExtra);
     goodsRevenue = Math.max(0, goodsRevenue);
     let revenue = goodsRevenue + shippingRevenue;
 
@@ -449,7 +461,13 @@ function createDiscountBlock(type) {
         <input class="value" placeholder="Value">
       </div>
 
-      ${type === "customer" ? '<label><input type="checkbox" class="stackable" checked> Allow combination with other discounts</label>' : ''}
+      
+
+      <div style="display:flex; gap:6px; margin:6px 0;">
+        <button onclick="moveUp(this)">↑</button>
+        <button onclick="moveDown(this)">↓</button>
+        <button onclick="removeDiscount(this)" style="color:red;">✕</button>
+      </div>
       <hr>
     </div>
   `;
@@ -501,6 +519,7 @@ function addCustomerDiscount() {
 
 function addSupplierDiscount() {
   document.getElementById("supplierDiscountsContainer").insertAdjacentHTML("beforeend", createDiscountBlock("supplier"));
+  updateDiscountVisibility(document);
 }
 
 
@@ -513,7 +532,28 @@ document.addEventListener("input", function(e) {
 });
 
 
+
+function removeDiscount(btn) {
+  btn.closest('.customer-discount, .supplier-discount').remove();
+  update();
+}
+
+function moveUp(btn) {
+  let el = btn.closest('.customer-discount, .supplier-discount');
+  let prev = el.previousElementSibling;
+  if (prev) el.parentNode.insertBefore(el, prev);
+  update();
+}
+
+function moveDown(btn) {
+  let el = btn.closest('.customer-discount, .supplier-discount');
+  let next = el.nextElementSibling;
+  if (next) el.parentNode.insertBefore(next, el);
+  update();
+}
+
 // Add default discount blocks on load
+
 window.addEventListener("DOMContentLoaded", () => {
   addCustomerDiscount();
   addSupplierDiscount();

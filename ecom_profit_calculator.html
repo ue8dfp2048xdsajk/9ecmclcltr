@@ -31,7 +31,34 @@
     font-weight: bold;
   }
 
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 260px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  padding: 6px;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
 </style>
+
 </head>
 <body>
 
@@ -101,6 +128,17 @@
 <label>Payment processor fee (%)</label>
 <input id="processorFeePercent" placeholder="e.g. 2.9">
 
+<label>Fulfilment & storage cost per unit 
+<span class="tooltip">ⓘ
+  <span class="tooltiptext">
+    Enter your fulfilment + storage cost per unit.<br>
+    Find this from your fulfilment provider.<br><br>
+    Amazon FBA: https://sellercentral.amazon.com/revcal
+  </span>
+</span>
+</label>
+<input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
+
 <h3>Ads</h3>
   <label>CPA</label>
   <input id="cpa" value="20">
@@ -136,7 +174,14 @@
         <th style="color:black;">Quantity</th>
         <th style="color:green;">Item Revenue</th>
         <th style="color:green;">Shipping Revenue</th>
-        <th style="color:green;">Revenue Before Discounts</th>
+        <th style="color:green;">
+  Revenue Before Discounts 
+  <span class="tooltip">ⓘ
+    <span class="tooltiptext">
+      This shows revenue before any item or shipping discounts are applied.
+    </span>
+  </span>
+</th>
         <th style="color:green;">Total Revenue</th>
         <th style="color:red;">Item Cost</th>
         <th style="color:red;">Shipping Cost</th>
@@ -262,7 +307,7 @@ function update() {
     let chargedQty = n;
     let goodsRevenue = n * price;
 
-    let revenueBeforeDiscounts = (n * price);
+    let revenueBeforeDiscounts = (n * price) + shipCustomer;
 
     // Build customer discounts array
     let customerDiscounts = [];
@@ -332,9 +377,12 @@ function update() {
     let percentFees = revenue * (platformPercent / 100) + revenue * (processorPercent / 100);
     let totalFees = percentFees + fixedFee;
 
+    let fulfilmentPerUnit = parseFloat(document.getElementById("fulfilmentPerUnit").value) || 0;
+    let fulfilmentCost = n * fulfilmentPerUnit;
+
 
     productCost = Math.max(0, productCost);
-    let totalCost = productCost + shippingCost;
+    let totalCost = productCost + shippingCost + fulfilmentCost;
     let profit = revenue - totalCost - totalFees;
     let profitAfterAds = profit - cpa;
     let currentROAS = profit > 0 ? revenue / profit : 0;
@@ -355,9 +403,9 @@ function update() {
       <td>${productCost.toFixed(2)}</td>
       <td>${shippingCost.toFixed(2)}</td>
       <td style="background:#ffe6e6;">${totalCost.toFixed(2)}</td>
-      <td style="background:#ffe6e6;">${totalFees.toFixed(2)}</td>
-      <td class="greenCol">${profit.toFixed(2)}</td>
-      <td class="greenCol">${profitAfterAds.toFixed(2)}</td>
+      <td style="background:#ffe6e6;">${(totalFees + fulfilmentCost).toFixed(2)}</td>
+      <td class="${profit >= 0 ? "greenCol" : ""}" style="${profit < 0 ? "background:#ffe6e6;" : ""}">${profit.toFixed(2)}</td>
+      <td class="${profitAfterAds >= 0 ? "greenCol" : ""}" style="${profitAfterAds < 0 ? "background:#ffe6e6;" : ""}">${profitAfterAds.toFixed(2)}</td>
     </tr>`;
 
     tbody.innerHTML += row;
@@ -410,7 +458,7 @@ function createDiscountBlock(type) {
 
 // Handle dynamic discount visibility
 function updateDiscountVisibility(container) {
-  container.querySelectorAll(".customer-discount").forEach(block => {
+  container.querySelectorAll(".customer-discount, .supplier-discount").forEach(block => {
     let type = block.querySelector(".type").value;
     let bxyFields = block.querySelector(".bxy-fields");
     let valueField = block.querySelector(".value-field");
@@ -469,6 +517,7 @@ document.addEventListener("input", function(e) {
 window.addEventListener("DOMContentLoaded", () => {
   addCustomerDiscount();
   addSupplierDiscount();
+  updateDiscountVisibility(document);
 });
 
 </script>

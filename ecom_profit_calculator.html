@@ -185,10 +185,16 @@
   <table id="table">
     <thead>
       <tr>
+        <th style="background:transparent;border:none;"></th>
+        <th id="revGroup" colspan="5" style="background:#e6ffe6; color:green;">Revenue</th>
+        <th id="costGroup" colspan="5" style="background:#ffe6e6; color:red;">Costs</th>
+        <th id="profitGroup" colspan="2" style="background:#fff3cd; color:#b8860b;">Profit / Loss</th>
+      </tr>
+      <tr>
         <th style="color:black;">Quantity</th>
-        <th style="color:green;">Item Revenue</th>
-        <th style="color:green;">Shipping Revenue</th>
-        <th style="color:green;">
+        <th style="color:green; font-weight:normal;">Item Revenue</th>
+        <th style="color:green; font-weight:normal;">Shipping Revenue</th>
+        <th style="color:green; font-weight:normal;">
   <span style="color:gray;">Revenue Before Discounts</span> 
   <span class="tooltip" style="color:gray;">ⓘ
     <span class="tooltiptext">
@@ -196,11 +202,11 @@
     </span>
   </span>
 </th>
-        <th style="color:green;">Total Revenue</th><th id="taxHeader" style="color:purple;">Revenue with Tax</th>
-        <th style="color:red;">Item Cost</th>
-        <th style="color:red;">Shipping Cost</th>
+        <th style="color:green;">Total Revenue</th><th id="taxHeader" style="color:purple; font-weight:normal;">Revenue with Tax</th>
+        <th style="color:red; font-weight:normal;">Item Cost</th>
+        <th style="color:red; font-weight:normal;">Shipping Cost</th>
         <th style="color:red;">Total Cost (COGS + Shipping)</th>
-        <th style="color:red;">Platform Fees</th>
+        <th style="color:red; font-weight:normal;">Platform Fees</th>
         <th style="color:black;">Profit</th>
         <th style="color:black;">Profit After Ads</th>
       </tr>
@@ -245,6 +251,28 @@ function handleVisibility() {
   let batchContainer = document.getElementById("batchContainer");
   if (batchToggle && batchContainer) {
     batchContainer.style.display = batchToggle.checked ? "block" : "none";
+  }
+}
+
+
+// Dynamic column grouping (future-proof)
+function updateGroupHeaders() {
+  let rev = document.getElementById("revGroup");
+  let cost = document.getElementById("costGroup");
+  let profit = document.getElementById("profitGroup");
+  let taxIncluded = document.getElementById("taxIncluded")?.checked;
+
+  if (rev && cost && profit) {
+    if (taxIncluded) {
+      // Tax is a cost
+      rev.colSpan = 4;
+      cost.colSpan = 5;
+    } else {
+      // Tax is revenue
+      rev.colSpan = 5;
+      cost.colSpan = 4;
+    }
+    profit.colSpan = 2;
   }
 }
 
@@ -463,7 +491,7 @@ if (taxIncluded) {
       <td style="color:green;">${shippingRevenue.toFixed(2)}</td>
       <td style="color:gray; background:#f2f2f2;">${revenueBeforeDiscounts.toFixed(2)}</td>
       <td style="color:green; font-weight:bold;">${revenue.toFixed(2)}</td>
-      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${taxIncluded ? 'white' : '#f2f2f2'}; font-weight:bold;">${taxIncluded ? taxValue.toFixed(2) : revenueWithTax.toFixed(2)}</td>
+      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${taxIncluded ? 'white' : '#f2f2f2'}; font-weight:normal;">${taxIncluded ? taxValue.toFixed(2) : revenueWithTax.toFixed(2)}</td>
       <td style="color:red;">${productCost.toFixed(2)}</td>
       <td style="color:red;">${shippingCost.toFixed(2)}</td>
       <td style="color:red; font-weight:bold;">${totalCost.toFixed(2)}</td>
@@ -481,11 +509,13 @@ if (taxIncluded) {
 }
 
 document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("change", updateGroupHeaders);
   el.addEventListener("change", handleVisibility);
   el.addEventListener("input", update);
 });
 
 handleVisibility();
+updateGroupHeaders();
 update();
 
 function createDiscountBlock(type) {
@@ -579,7 +609,8 @@ function addSupplierDiscount() {
 document.addEventListener("input", function(e) {
   if (e.target.closest("#customerDiscountsContainer") || 
       e.target.closest("#supplierDiscountsContainer")) {
-    update();
+    updateGroupHeaders();
+update();
   }
 });
 
@@ -587,21 +618,24 @@ document.addEventListener("input", function(e) {
 
 function removeDiscount(btn) {
   btn.closest('.customer-discount, .supplier-discount').remove();
-  update();
+  updateGroupHeaders();
+update();
 }
 
 function moveUp(btn) {
   let el = btn.closest('.customer-discount, .supplier-discount');
   let prev = el.previousElementSibling;
   if (prev) el.parentNode.insertBefore(el, prev);
-  update();
+  updateGroupHeaders();
+update();
 }
 
 function moveDown(btn) {
   let el = btn.closest('.customer-discount, .supplier-discount');
   let next = el.nextElementSibling;
   if (next) el.parentNode.insertBefore(next, el);
-  update();
+  updateGroupHeaders();
+update();
 }
 
 // Add default discount blocks on load

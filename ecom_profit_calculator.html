@@ -72,6 +72,18 @@
   <label>Single unit cost</label>
   <input id="costSingle" value="3.10">
 
+  <h3>Customer Discounts</h3>
+<div id="customerDiscountsContainer"></div>
+<button onclick="addCustomerDiscount()">+ Add Customer Discount</button>
+
+
+
+
+  <h3>Supplier Discounts</h3>
+<div id="supplierDiscountsContainer"></div>
+
+<label><input type="checkbox" id="enableBatch"> Enable Batch Pricing</label>
+<div id="batchContainer" style="display:none;">
   <div style="display:flex; gap:10px;">
     <div style="flex:1;">
       <label>Batch cost</label>
@@ -86,19 +98,9 @@
   <label>Pricing Model</label>
   <select id="pricingModel">
     <option value="unit">Per Unit Pricing</option>
-    <option value="batch">Batch Production (e.g. sticker sheets)</option>
+    <option value="batch">Batch Production</option>
   </select>
-
-  
-  <h3>Customer Discounts</h3>
-<div id="customerDiscountsContainer"></div>
-<button onclick="addCustomerDiscount()">+ Add Customer Discount</button>
-
-
-
-
-  <h3>Supplier Discounts</h3>
-<div id="supplierDiscountsContainer"></div>
+</div>
 <button onclick="addSupplierDiscount()">+ Add Supplier Discount</button>
 
 
@@ -134,7 +136,7 @@
 <input id="processorFeePercent" placeholder="e.g. 2.9">
 
 <label>Fulfilment & storage cost per unit 
-<span class="tooltip">ⓘ
+<span class="tooltip" style="color:gray;">ⓘ
   <span class="tooltiptext">
     Enter your fulfilment + storage cost per unit.<br>
     Find this from your fulfilment provider.<br><br>
@@ -144,20 +146,27 @@
 </label>
 <input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
 
+
+<h3>Tax</h3>
+<label>Tax rate (%)</label>
+<input id="taxRate" value="20">
+
+<label><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
+<label><input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax</label>
+
 <h3>Ads</h3>
-  <label>CPA</label>
+
+  <label>Estimated CPA</label>
   <input id="cpa" value="20">
+  <label>Estimated Quantity Bought</label>
+  <input id="selectedQty" type="number" min="1" max="24" value="6">
+
 </div>
 
 <div class="right">
   <h2>Results</h2>
 
   
-<div style="margin-top:10px;">
-  <label>Selected Quantity</label>
-  <input id="selectedQty" type="number" min="1" max="24" value="6">
-</div>
-
   <div class="metrics">
     <div class="card">
       <div>Max CPA (Break-even)</div>
@@ -180,20 +189,20 @@
         <th style="color:green;">Item Revenue</th>
         <th style="color:green;">Shipping Revenue</th>
         <th style="color:green;">
-  Revenue Before Discounts 
-  <span class="tooltip">ⓘ
+  <span style="color:gray;">Revenue Before Discounts</span> 
+  <span class="tooltip" style="color:gray;">ⓘ
     <span class="tooltiptext">
       This shows revenue before any item or shipping discounts are applied.
     </span>
   </span>
 </th>
-        <th style="color:green;">Total Revenue</th>
+        <th style="color:green;">Total Revenue</th><th id="taxHeader" style="color:purple;">Revenue with Tax</th>
         <th style="color:red;">Item Cost</th>
         <th style="color:red;">Shipping Cost</th>
         <th style="color:red;">Total Cost (COGS + Shipping)</th>
         <th style="color:red;">Platform Fees</th>
-        <th style="color:green;">Profit</th>
-        <th style="color:green;">Profit After Ads</th>
+        <th style="color:black;">Profit</th>
+        <th style="color:black;">Profit After Ads</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -202,7 +211,8 @@
 
 <script>
 function calcBatchCost(n, costSingle, costBatch, batchSize) {
-  let model = document.getElementById("pricingModel").value;
+  let batchEnabled = document.getElementById("enableBatch")?.checked;
+  let model = batchEnabled ? document.getElementById("pricingModel").value : "unit";
 
   // Per unit pricing
   if (model === "unit") {
@@ -230,6 +240,12 @@ function handleVisibility() {
   if (!toggle || !container) return;
 
   container.style.display = toggle.checked ? "block" : "none";
+
+  let batchToggle = document.getElementById("enableBatch");
+  let batchContainer = document.getElementById("batchContainer");
+  if (batchToggle && batchContainer) {
+    batchContainer.style.display = batchToggle.checked ? "block" : "none";
+  }
 }
 
 function update() {
@@ -248,7 +264,12 @@ function update() {
   let cpa = parseFloat(document.getElementById("cpa").value);
 
   let tbody = document.querySelector("#table tbody");
-  tbody.innerHTML = "";
+  
+tbody.innerHTML = "";
+let taxIncluded = document.getElementById("taxIncluded").checked;
+document.getElementById("taxHeader").innerText = taxIncluded ? "Tax Payable" : "Revenue with Tax";
+document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
+
 
   let bestProfit = -Infinity;
   let breakEvenCPA = 0;
@@ -354,15 +375,20 @@ function update() {
 
       // APPLY LOGIC
       if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
-        let groups = Math.floor(chargedQty / (d.bx + d.by));
-        let discountUnits = groups * d.by;
+        let groupSize = d.bx + d.by;
+        let groups = Math.floor(n / groupSize);
+        let remainder = n % groupSize;
+
+        // customer only pays for X per group + remainder capped at X
+        let payableUnits = (groups * d.bx) + Math.min(remainder, d.bx);
 
         if (d.discountType === "free") {
-          chargedQty -= discountUnits;
-          goodsRevenue = chargedQty * price;
+          goodsRevenue = payableUnits * price;
         } else if (d.discountType === "percent") {
+          let discountUnits = n - payableUnits;
           goodsRevenue -= discountUnits * price * (d.value / 100);
         } else if (d.discountType === "fixed") {
+          let discountUnits = n - payableUnits;
           goodsRevenue -= discountUnits * d.value;
         }
       }
@@ -379,7 +405,27 @@ function update() {
     let freeShipEnabled = document.getElementById("freeShipToggle").checked;
     let shippingRevenue = (freeShipEnabled && goodsRevenue >= freeShip) ? 0 : (shipCustomerFirst + (n - 1) * shipCustomerExtra);
     goodsRevenue = Math.max(0, goodsRevenue);
-    let revenue = goodsRevenue + shippingRevenue;
+    
+let revenue = goodsRevenue + shippingRevenue;
+
+// TAX LOGIC
+let taxPercent = parseFloat(document.getElementById("taxRate").value) || 0;
+let taxRate = taxPercent / 100;
+let taxFraction = taxPercent / (100 + taxPercent);
+
+let taxIncluded = document.getElementById("taxIncluded").checked;
+let includeShippingInTax = document.getElementById("includeShippingInTax").checked;
+
+let taxBase = includeShippingInTax ? revenue : goodsRevenue;
+
+let taxValue = taxIncluded 
+  ? taxBase * taxFraction   // VAT extraction
+  : taxBase * taxRate;      // added on top
+
+let revenueWithTax = taxIncluded 
+  ? revenue 
+  : (includeShippingInTax ? revenue * (1 + taxRate) : (goodsRevenue * (1 + taxRate) + shippingRevenue));
+
 
     // PLATFORM FEES
     let platformPercent = parseFloat(document.getElementById("platformFeePercent").value) || 0;
@@ -396,6 +442,11 @@ function update() {
     productCost = Math.max(0, productCost);
     let totalCost = productCost + shippingCost + fulfilmentCost;
     let profit = revenue - totalCost - totalFees;
+
+// Subtract tax when it's already included in price (VAT mode)
+if (taxIncluded) {
+  profit -= taxValue;
+}
     let profitAfterAds = profit - cpa;
     let currentROAS = profit > 0 ? revenue / profit : 0;
 
@@ -408,16 +459,17 @@ function update() {
 
     let row = `<tr class="${profit === bestProfit ? 'highlight' : ''}">
       <td>${n}</td>
-      <td>${goodsRevenue.toFixed(2)}</td>
-      <td>${shippingRevenue.toFixed(2)}</td>
-      <td>${revenueBeforeDiscounts.toFixed(2)}</td>
-      <td class="greenCol">${revenue.toFixed(2)}</td>
-      <td>${productCost.toFixed(2)}</td>
-      <td>${shippingCost.toFixed(2)}</td>
-      <td style="background:#ffe6e6;">${totalCost.toFixed(2)}</td>
-      <td style="background:#ffe6e6;">${(totalFees + fulfilmentCost).toFixed(2)}</td>
-      <td class="${profit >= 0 ? "greenCol" : ""}" style="${profit < 0 ? "background:#ffe6e6;" : ""}">${profit.toFixed(2)}</td>
-      <td class="${profitAfterAds >= 0 ? "greenCol" : ""}" style="${profitAfterAds < 0 ? "background:#ffe6e6;" : ""}">${profitAfterAds.toFixed(2)}</td>
+      <td style="color:green;">${goodsRevenue.toFixed(2)}</td>
+      <td style="color:green;">${shippingRevenue.toFixed(2)}</td>
+      <td style="color:gray; background:#f2f2f2;">${revenueBeforeDiscounts.toFixed(2)}</td>
+      <td style="color:green; font-weight:bold;">${revenue.toFixed(2)}</td>
+      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${taxIncluded ? 'white' : '#f2f2f2'}; font-weight:bold;">${taxIncluded ? taxValue.toFixed(2) : revenueWithTax.toFixed(2)}</td>
+      <td style="color:red;">${productCost.toFixed(2)}</td>
+      <td style="color:red;">${shippingCost.toFixed(2)}</td>
+      <td style="color:red; font-weight:bold;">${totalCost.toFixed(2)}</td>
+      <td style="color:red;">${(totalFees + fulfilmentCost).toFixed(2)}</td>
+      <td style="color:${profit >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profit >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profit.toFixed(2)}</td>
+      <td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profitAfterAds.toFixed(2)}</td>
     </tr>`;
 
     tbody.innerHTML += row;

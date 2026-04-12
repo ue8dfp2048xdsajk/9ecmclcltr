@@ -64,62 +64,18 @@
 
   
   <h3>Customer Discounts</h3>
+<div id="customerDiscountsContainer"></div>
+<button onclick="addCustomerDiscount()">+ Add Customer Discount</button>
 
 
-<label>Buy X Get Y</label>
-<input id="custBX" placeholder="Buy X">
-<input id="custBY" placeholder="Get Y">
-<select id="custBXYType">
-  <option value="free">Free</option>
-  <option value="percent">% Off</option>
-  <option value="fixed">Amount Off Each</option>
-</select>
-<input id="custBXYValue" placeholder="Value">
 
-<label>Discount Type</label>
-<select id="custDiscountType">
-  <option value="none">None</option>
-  <option value="percent">% Discount</option>
-  <option value="fixed">Fixed Discount</option>
-</select>
-<input id="custDiscountValue" placeholder="Value">
-
-<label>Minimum Requirement</label>
-<select id="custMinType">
-  <option value="none">None</option>
-  <option value="quantity">Minimum Quantity</option>
-  <option value="amount">Minimum Amount</option>
-</select>
-<input id="custMinValue" placeholder="Value">
 
   <h3>Supplier Discounts</h3>
+<div id="supplierDiscountsContainer"></div>
+<button onclick="addSupplierDiscount()">+ Add Supplier Discount</button>
 
 
-<label>Buy X Get Y</label>
-<input id="suppBX" placeholder="Buy X">
-<input id="suppBY" placeholder="Get Y">
-<select id="suppBXYType">
-  <option value="free">Free</option>
-  <option value="percent">% Off</option>
-  <option value="fixed">Amount Off Each</option>
-</select>
-<input id="suppBXYValue" placeholder="Value">
 
-<label>Discount Type</label>
-<select id="suppDiscountType">
-  <option value="none">None</option>
-  <option value="percent">% Discount</option>
-  <option value="fixed">Fixed Discount</option>
-</select>
-<input id="suppDiscountValue" placeholder="Value">
-
-<label>Minimum Requirement</label>
-<select id="suppMinType">
-  <option value="none">None</option>
-  <option value="quantity">Minimum Quantity</option>
-  <option value="amount">Minimum Amount</option>
-</select>
-<input id="suppMinValue" placeholder="Value">
 <h3>Shipping</h3>
   <label>Customer shipping price</label>
   <input id="shipCustomer" value="4.99">
@@ -217,13 +173,7 @@ function calcBatchCost(n, costSingle, costBatch, batchSize) {
 }
 
 
-function handleVisibility() {
-  let custType = document.getElementById("custBXYType").value;
-  document.getElementById("custBXYValue").style.display = custType === "free" ? "none" : "block";
-
-  let suppType = document.getElementById("suppBXYType").value;
-  document.getElementById("suppBXYValue").style.display = suppType === "free" ? "none" : "block";
-}
+function handleVisibility() {}
 
 function update() {
   let price = parseFloat(document.getElementById("price").value);
@@ -251,88 +201,120 @@ function update() {
     let productCost = calcBatchCost(n, costSingle, costBatch, batchSize);
 
     // SUPPLIER DISCOUNTS
-    let suppBX = parseFloat(document.getElementById("suppBX").value) || 0;
-    let suppBY = parseFloat(document.getElementById("suppBY").value) || 0;
-    let suppBXYType = document.getElementById("suppBXYType").value;
-    let suppBXYValue = parseFloat(document.getElementById("suppBXYValue").value) || 0;
 
-    let suppDiscountType = document.getElementById("suppDiscountType").value;
-    let suppDiscountValue = parseFloat(document.getElementById("suppDiscountValue").value) || 0;
+    let supplierDiscounts = [];
+    document.querySelectorAll("#supplierDiscountsContainer .supplier-discount").forEach(el => {
+      supplierDiscounts.push({
+        type: el.querySelector(".type").value,
+        bx: parseFloat(el.querySelector(".bx").value) || 0,
+        by: parseFloat(el.querySelector(".by").value) || 0,
+        discountType: el.querySelector(".bxyType").value,
+        value: parseFloat(el.querySelector(".value").value) || 0,
+        minType: "none",
+        minValue: 0,
+        stackable: true
+      });
+    });
+    if (supplierDiscounts.length === 0) { supplierDiscounts = []; }
 
-    let suppMinType = document.getElementById("suppMinType").value;
-    let suppMinValue = parseFloat(document.getElementById("suppMinValue").value) || 0;
+    let nonStackSupp = false;
 
-    let meetsMinSupp = true;
-    if (suppMinType === "quantity") meetsMinSupp = n >= suppMinValue;
-    if (suppMinType === "amount") meetsMinSupp = productCost >= suppMinValue;
+    for (let d of supplierDiscounts) {
 
-    if (meetsMinSupp && suppBX > 0 && suppBY > 0) {
-      let groups = Math.floor(n / (suppBX + suppBY));
-      let discountUnits = groups * suppBY;
-      let unitCostApprox = productCost / n;
+      let meetsMinSupp = true;
+      if (d.minType === "quantity") meetsMinSupp = n >= d.minValue;
+      if (d.minType === "amount") meetsMinSupp = productCost >= d.minValue;
+      if (!meetsMinSupp) continue;
 
-      if (suppBXYType === "free") {
-        productCost -= discountUnits * unitCostApprox;
-      } else if (suppBXYType === "percent") {
-        productCost -= discountUnits * unitCostApprox * (suppBXYValue / 100);
-      } else if (suppBXYType === "fixed") {
-        productCost -= discountUnits * suppBXYValue;
+      if (!d.stackable) {
+        nonStackSupp = true;
       }
-    }
 
-    if (meetsMinSupp) {
-      if (suppDiscountType === "percent") {
-        productCost *= (1 - suppDiscountValue / 100);
-      } else if (suppDiscountType === "fixed") {
-        productCost = Math.max(0, productCost - suppDiscountValue);
+      if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
+        let groups = Math.floor(n / (d.bx + d.by));
+        let discountUnits = groups * d.by;
+        let unitCostApprox = productCost / n;
+
+        if (d.discountType === "free") {
+          productCost -= discountUnits * unitCostApprox;
+        } else if (d.discountType === "percent") {
+          productCost -= discountUnits * unitCostApprox * (d.value / 100);
+        } else if (d.discountType === "fixed") {
+          productCost -= discountUnits * d.value;
+        }
       }
+
+      if (d.type === "percent") {
+        productCost *= (1 - d.value / 100);
+      } else if (d.type === "fixed") {
+        productCost = Math.max(0, productCost - d.value);
+      }
+
+      if (!d.stackable) break;
     }
 
     let shippingCost = shipFirst + (n - 1) * shipExtra;
 
     
     // CUSTOMER DISCOUNTS
-    let custBX = parseFloat(document.getElementById("custBX").value) || 0;
-    let custBY = parseFloat(document.getElementById("custBY").value) || 0;
-    let custBXYType = document.getElementById("custBXYType").value;
-    let custBXYValue = parseFloat(document.getElementById("custBXYValue").value) || 0;
-
-    let custDiscountType = document.getElementById("custDiscountType").value;
-    let custDiscountValue = parseFloat(document.getElementById("custDiscountValue").value) || 0;
-
-    let custMinType = document.getElementById("custMinType").value;
-    let custMinValue = parseFloat(document.getElementById("custMinValue").value) || 0;
 
     let chargedQty = n;
     let goodsRevenue = n * price;
 
-    // Check minimums
-    let meetsMin = true;
-    if (custMinType === "quantity") meetsMin = n >= custMinValue;
-    if (custMinType === "amount") meetsMin = goodsRevenue >= custMinValue;
+    // Build customer discounts array
+    let customerDiscounts = [];
 
-    if (meetsMin && custBX > 0 && custBY > 0) {
-      let groups = Math.floor(n / (custBX + custBY));
-      let discountUnits = groups * custBY;
+    document.querySelectorAll("#customerDiscountsContainer .customer-discount").forEach(el => {
+      customerDiscounts.push({
+        type: el.querySelector(".type").value,
+        bx: parseFloat(el.querySelector(".bx").value) || 0,
+        by: parseFloat(el.querySelector(".by").value) || 0,
+        discountType: el.querySelector(".bxyType").value,
+        value: parseFloat(el.querySelector(".value").value) || 0,
+        minType: "none",
+        minValue: 0,
+        stackable: true
+      });
+    });
 
-      if (custBXYType === "free") {
-        chargedQty = n - discountUnits;
-        goodsRevenue = chargedQty * price;
-      } else if (custBXYType === "percent") {
-        goodsRevenue -= discountUnits * price * (custBXYValue / 100);
-      } else if (custBXYType === "fixed") {
-        goodsRevenue -= discountUnits * custBXYValue;
+    let nonStackApplied = false;
+
+    for (let d of customerDiscounts) {
+
+      // check minimum
+      let meetsMin = true;
+      if (d.minType === "quantity") meetsMin = n >= d.minValue;
+      if (d.minType === "amount") meetsMin = goodsRevenue >= d.minValue;
+      if (!meetsMin) continue;
+
+      if (!d.stackable) {
+        // Apply ONLY this discount and ignore all others
+        nonStackApplied = true;
       }
-    }
 
-    if (meetsMin) {
-      if (custDiscountType === "percent") {
-        goodsRevenue *= (1 - custDiscountValue / 100);
-      } else if (custDiscountType === "fixed") {
-        goodsRevenue = Math.max(0, goodsRevenue - custDiscountValue);
+      // APPLY LOGIC
+      if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
+        let groups = Math.floor(chargedQty / (d.bx + d.by));
+        let discountUnits = groups * d.by;
+
+        if (d.discountType === "free") {
+          chargedQty -= discountUnits;
+          goodsRevenue = chargedQty * price;
+        } else if (d.discountType === "percent") {
+          goodsRevenue -= discountUnits * price * (d.value / 100);
+        } else if (d.discountType === "fixed") {
+          goodsRevenue -= discountUnits * d.value;
+        }
       }
-    }
 
+      if (d.type === "percent") {
+        goodsRevenue *= (1 - d.value / 100);
+      } else if (d.type === "fixed") {
+        goodsRevenue = Math.max(0, goodsRevenue - d.value);
+      }
+
+      if (!d.stackable) break;
+    }
 
     let freeShipEnabled = document.getElementById("freeShipToggle").checked;
     let shippingRevenue = (freeShipEnabled && goodsRevenue >= freeShip) ? 0 : shipCustomer;
@@ -389,6 +371,102 @@ document.querySelectorAll("input, select").forEach(el => {
 
 handleVisibility();
 update();
+
+function createDiscountBlock(type) {
+  return `
+    <div class="${type}-discount">
+      <label>Type</label>
+      <select class="type">
+        <option value="bxy">Buy X Get Y</option>
+        <option value="percent">% Discount</option>
+        <option value="fixed">Fixed Discount</option>
+      </select>
+
+      <div class="bxy-fields">
+        <input class="bx" placeholder="Buy X">
+        <input class="by" placeholder="Get Y">
+
+        <select class="bxyType">
+        <option value="free">Free</option>
+        <option value="percent">% Off</option>
+        <option value="fixed">Amount Off</option>
+      </select>
+      </div>
+
+      <div class="value-field">
+        <input class="value" placeholder="Value">
+      </div>
+
+      ${type === "customer" ? '<label><input type="checkbox" class="stackable" checked> Allow combination with other discounts</label>' : ''}
+      <hr>
+    </div>
+  `;
+}
+
+
+// Handle dynamic discount visibility
+function updateDiscountVisibility(container) {
+  container.querySelectorAll(".customer-discount").forEach(block => {
+    let type = block.querySelector(".type").value;
+    let bxyFields = block.querySelector(".bxy-fields");
+    let valueField = block.querySelector(".value-field");
+    let bxyType = block.querySelector(".bxyType")?.value;
+
+    // Show/hide BXY fields
+    if (type === "bxy") {
+      bxyFields.style.display = "block";
+
+      // Hide value if FREE
+      if (bxyType === "free") {
+        valueField.style.display = "none";
+      } else {
+        valueField.style.display = "block";
+      }
+
+    } else {
+      bxyFields.style.display = "none";
+      valueField.style.display = "block";
+    }
+  });
+}
+
+// Hook into changes
+document.addEventListener("change", function(e) {
+  if (e.target.classList.contains("bxyType")) {
+    updateDiscountVisibility(document);
+  }
+  if (e.target.classList.contains("type")) {
+    updateDiscountVisibility(document);
+  }
+});
+
+// Run after adding discount
+function addCustomerDiscount() {
+  document.getElementById("customerDiscountsContainer")
+    .insertAdjacentHTML("beforeend", createDiscountBlock("customer"));
+  updateDiscountVisibility(document);
+}
+
+function addSupplierDiscount() {
+  document.getElementById("supplierDiscountsContainer").insertAdjacentHTML("beforeend", createDiscountBlock("supplier"));
+}
+
+
+// 🔥 Fix: ensure dynamic inputs trigger update
+document.addEventListener("input", function(e) {
+  if (e.target.closest("#customerDiscountsContainer") || 
+      e.target.closest("#supplierDiscountsContainer")) {
+    update();
+  }
+});
+
+
+// Add default discount blocks on load
+window.addEventListener("DOMContentLoaded", () => {
+  addCustomerDiscount();
+  addSupplierDiscount();
+});
+
 </script>
 
 </body>

@@ -136,6 +136,7 @@
         <th style="color:black;">Quantity</th>
         <th style="color:green;">Item Revenue</th>
         <th style="color:green;">Shipping Revenue</th>
+        <th style="color:green;">Revenue Before Discounts</th>
         <th style="color:green;">Total Revenue</th>
         <th style="color:red;">Item Cost</th>
         <th style="color:red;">Shipping Cost</th>
@@ -261,6 +262,8 @@ function update() {
     let chargedQty = n;
     let goodsRevenue = n * price;
 
+    let revenueBeforeDiscounts = (n * price);
+
     // Build customer discounts array
     let customerDiscounts = [];
 
@@ -347,6 +350,7 @@ function update() {
       <td>${n}</td>
       <td>${goodsRevenue.toFixed(2)}</td>
       <td>${shippingRevenue.toFixed(2)}</td>
+      <td>${revenueBeforeDiscounts.toFixed(2)}</td>
       <td class="greenCol">${revenue.toFixed(2)}</td>
       <td>${productCost.toFixed(2)}</td>
       <td>${shippingCost.toFixed(2)}</td>

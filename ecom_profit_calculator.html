@@ -180,7 +180,8 @@
         <th style="color:green;">Total Revenue</th><th id="taxHeader" style="color:purple; font-weight:normal;">Revenue with Tax</th>
         <th style="color:red; font-weight:normal;">Item Cost</th>
         <th style="color:red; font-weight:normal;">Shipping Cost</th>
-        <th style="color:red;">Total Cost (COGS + Shipping)</th>
+        <th style="color:red; font-weight:normal;">Fulfilment & Storage Fees</th>
+        <th style="color:red;">Total Cost (COGS + Shipping + Fulfilment)</th>
         <th style="color:red; font-weight:normal;">Platform Fees</th>
         <th style="color:black;">Profit</th>
         <th style="color:black;">Profit After Ads</th>
@@ -469,8 +470,9 @@ if (taxIncluded) {
       <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${taxIncluded ? 'white' : '#f2f2f2'}; font-weight:normal;">${taxIncluded ? taxValue.toFixed(2) : revenueWithTax.toFixed(2)}</td>
       <td style="color:red;">${productCost.toFixed(2)}</td>
       <td style="color:red;">${shippingCost.toFixed(2)}</td>
+      <td style="color:red;">${fulfilmentCost.toFixed(2)}</td>
       <td style="color:red; font-weight:bold;">${totalCost.toFixed(2)}</td>
-      <td style="color:red;">${(totalFees + fulfilmentCost).toFixed(2)}</td>
+      <td style="color:red;">${totalFees.toFixed(2)}</td>
       <td style="color:${profit >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profit >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profit.toFixed(2)}</td>
       <td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profitAfterAds.toFixed(2)}</td>
     </tr>`;

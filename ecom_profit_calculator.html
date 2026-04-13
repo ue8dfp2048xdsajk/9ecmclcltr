@@ -239,15 +239,8 @@ function updateGroupHeaders() {
   let taxIncluded = document.getElementById("taxIncluded")?.checked;
 
   if (rev && cost && profit) {
-    if (taxIncluded) {
-      // Tax is a cost
-      rev.colSpan = 4;
-      cost.colSpan = 5;
-    } else {
-      // Tax is revenue
-      rev.colSpan = 5;
-      cost.colSpan = 4;
-    }
+    rev.colSpan = 5;
+    cost.colSpan = 5;
     profit.colSpan = 2;
   }
 }

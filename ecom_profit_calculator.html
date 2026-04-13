@@ -151,10 +151,7 @@
       <div>Break-even ROAS</div>
       <div id="breakEvenROAS">-</div>
     </div>
-    <div class="card">
-      <div>Profit at CPA</div>
-      <div id="profitCPA">-</div>
-    </div>
+    
   </div>
 
   <table id="table">
@@ -451,7 +448,7 @@ if (taxIncluded) {
     let selectedQty = parseInt(document.getElementById("selectedQty").value) || 1;
     if (n === selectedQty) {
       breakEvenCPA = profit;
-      breakEvenROAS = currentROAS;
+      breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : 0;
     }
 
     let row = `<tr class="${profit === bestProfit ? 'highlight' : ''}">
@@ -474,7 +471,7 @@ if (taxIncluded) {
   }
 
   document.getElementById("breakEven").innerText = "$" + breakEvenCPA.toFixed(2);
-  document.getElementById("profitCPA").innerText = "$" + (breakEvenCPA - cpa).toFixed(2);
+  
   document.getElementById("breakEvenROAS").innerText = breakEvenROAS.toFixed(2) + "x";
 }
 

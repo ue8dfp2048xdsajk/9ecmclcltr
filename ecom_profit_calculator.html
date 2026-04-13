@@ -144,11 +144,11 @@
   
   <div class="metrics">
     <div class="card">
-      <div>Max CPA (Break-even) At Selected Quantity</div>
+      <div>Max CPA (Break-even) At Estimated Quantity Bought</div>
       <div id="breakEven">-</div>
     </div>
     <div class="card">
-      <div>Break-even ROAS At Selected Quantity</div>
+      <div>Break-even ROAS At Estimated Quantity Bought</div>
       <div id="breakEvenROAS">-</div>
     </div>
     
@@ -181,7 +181,7 @@
         <th style="color:red;">Total Cost (COGS + Shipping + Fulfilment)</th>
         <th style="color:red; font-weight:normal;">Platform Fees</th>
         <th style="color:black;">Profit</th>
-        <th style="color:black;">Profit After Ads At CPA</th>
+        <th style="color:black;">Profit After Ads At Estimated CPA</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -243,19 +243,19 @@ function updateGroupHeaders() {
 }
 
 function update() {
-  let price = parseFloat(document.getElementById("price").value);
-  let costSingle = parseFloat(document.getElementById("costSingle").value);
-  let costBatch = parseFloat(document.getElementById("costBatch").value);
-  let batchSize = parseInt(document.getElementById("batchSize").value);
+  let price = parseFloat(document.getElementById("price").value) || 0;
+  let costSingle = parseFloat(document.getElementById("costSingle").value) || 0;
+  let costBatch = parseFloat(document.getElementById("costBatch").value) || 0;
+  let batchSize = parseInt(document.getElementById("batchSize").value) || 0;
 
-  let shipCustomerFirst = parseFloat(document.getElementById("shipCustomerFirst").value);
-  let shipCustomerExtra = parseFloat(document.getElementById("shipCustomerExtra").value);
-  let freeShip = parseFloat(document.getElementById("freeShip").value);
+  let shipCustomerFirst = parseFloat(document.getElementById("shipCustomerFirst").value) || 0;
+  let shipCustomerExtra = parseFloat(document.getElementById("shipCustomerExtra").value) || 0;
+  let freeShip = parseFloat(document.getElementById("freeShip").value) || 0;
 
-  let shipFirst = parseFloat(document.getElementById("shipFirst").value);
-  let shipExtra = parseFloat(document.getElementById("shipExtra").value);
+  let shipFirst = parseFloat(document.getElementById("shipFirst").value) || 0;
+  let shipExtra = parseFloat(document.getElementById("shipExtra").value) || 0;
 
-  let cpa = parseFloat(document.getElementById("cpa").value);
+  let cpa = parseFloat(document.getElementById("cpa").value) || 0;
 
   let tbody = document.querySelector("#table tbody");
   
@@ -447,7 +447,7 @@ if (taxIncluded) {
     if (profit > bestProfit) bestProfit = profit;
     let selectedQty = parseInt(document.getElementById("selectedQty").value) || 1;
     if (n === selectedQty) {
-      breakEvenCPA = profit;
+      breakEvenCPA = Math.max(0, profit);
       breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : 0;
     }
 

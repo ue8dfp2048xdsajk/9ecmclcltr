@@ -194,7 +194,13 @@
 <script>
 function calcBatchCost(n, costSingle, costBatch, batchSize) {
   let batchEnabled = document.getElementById("enableBatch")?.checked;
-  let model = batchEnabled ? document.getElementById("pricingModel").value : "unit";
+
+  // If batch pricing is NOT enabled, always use single unit cost
+  if (!batchEnabled) {
+    return n * costSingle;
+  }
+
+  let model = document.getElementById("pricingModel").value;
 
   // Per unit pricing
   if (model === "unit") {
@@ -204,7 +210,7 @@ function calcBatchCost(n, costSingle, costBatch, batchSize) {
     return batches * costBatch + remainder * costSingle;
   }
 
-  // Batch production (stickers etc.)
+  // Batch production
   let batches = Math.floor(n / batchSize);
   let remainder = n % batchSize;
   let cost = batches * costBatch;

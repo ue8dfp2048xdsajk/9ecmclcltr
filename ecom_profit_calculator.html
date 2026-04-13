@@ -141,6 +141,7 @@
 </div>
 <div class="right">
   <h2>Results</h2>
+<label><input type="checkbox" id="marginWithAdsToggle"> Show Profit Margin With Ads</label>
 
   
   <div class="metrics">
@@ -161,7 +162,7 @@
         <th style="background:transparent;border:none;"></th>
         <th id="revGroup" colspan="5" style="background:#e6ffe6; color:green;">Revenue</th>
         <th id="costGroup" colspan="5" style="background:#ffe6e6; color:red;">Costs</th>
-        <th id="profitGroup" colspan="2" style="background:#fff3cd; color:#b8860b;">Profit / Loss</th>
+        <th id="profitGroup" colspan="3" style="background:#fff3cd; color:#b8860b;">Profit / Loss</th>
       </tr>
       <tr>
         <th style="color:black;">Quantity</th>
@@ -183,6 +184,7 @@
         <th style="color:red; font-weight:normal;">Platform Fees</th>
         <th style="color:black;">Profit</th>
         <th style="color:black;">Profit After Ads At Estimated CPA</th>
+        <th style="color:black;">Profit Margin %</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -443,6 +445,8 @@ if (taxIncluded) {
   profit -= taxValue;
 }
     let profitAfterAds = profit - cpa;
+    let marginWithAds = document.getElementById("marginWithAdsToggle").checked;
+    let profitMargin = revenue > 0 ? ((marginWithAds ? profitAfterAds : profit) / revenue) * 100 : 0;
 
     if (profit > bestProfit) bestProfit = profit;
     let selectedQty = parseInt(document.getElementById("selectedQty").value) || 1;
@@ -465,6 +469,7 @@ if (taxIncluded) {
       <td style="color:red;">${totalFees.toFixed(2)}</td>
       <td style="color:${profit >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profit >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profit.toFixed(2)}</td>
       <td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profitAfterAds.toFixed(2)}</td>
+      <td style="color:${profitMargin >= 0 ? 'green' : 'red'}; font-weight:bold;">${profitMargin.toFixed(2)}%</td>
     </tr>`;
 
     tbody.innerHTML += row;

@@ -160,7 +160,7 @@
       <div id="breakEven">-</div>
     </div>
     <div class="card">
-      <div>Break-even ROAS At Selected Quantity</div>
+      <div>ROAS Required to Break Even At Selected Quantity</div>
       <div id="breakEvenROAS">-</div>
     </div>
     
@@ -187,13 +187,13 @@
   </span>
 </th>
         <th style="color:green;">Total Revenue</th><th id="taxHeader" style="color:purple; font-weight:normal;">Revenue with Tax</th>
-        <th style="color:red; font-weight:normal;">Item Cost (COGS)</th>
+        <th style="color:red; font-weight:normal;">Item Cost</th>
         <th style="color:red; font-weight:normal;">Shipping Cost</th>
         <th style="color:red; font-weight:normal;">Fulfilment & Storage Fees</th>
         <th style="color:red;">Total Cost (COGS + Shipping + Fulfilment)</th>
         <th style="color:red; font-weight:normal;">Platform Fees</th>
         <th style="color:black;">Profit</th>
-        <th style="color:black;">Profit After Ads At CPA</th>
+        <th style="color:black;">Profit After Ads At Estimated CPA</th>
         <th style="color:black;">Profit Margin %</th>
       </tr>
     </thead>
@@ -482,7 +482,7 @@ if (taxIncluded) {
     let selectedQty = parseInt(document.getElementById("selectedQty").value) || 1;
     if (n === selectedQty) {
       breakEvenCPA = Math.max(0, profit);
-      breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : 0;
+      breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : null;
     }
 
     let row = `<tr class="${profit === bestProfit ? 'highlight' : ''} ${document.getElementById("selectedQty").value ? (n === selectedQty ? 'selectedRow' : '') : ''}">
@@ -507,7 +507,7 @@ if (taxIncluded) {
 
   document.getElementById("breakEven").innerText = "$" + breakEvenCPA.toFixed(2);
   
-  document.getElementById("breakEvenROAS").innerText = breakEvenROAS.toFixed(2) + "x";
+  document.getElementById("breakEvenROAS").innerText = breakEvenROAS ? breakEvenROAS.toFixed(2) + "x" : "-";
 }
 
 document.querySelectorAll("input, select").forEach(el => {

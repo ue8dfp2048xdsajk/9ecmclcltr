@@ -117,6 +117,7 @@
   <input id="cpa" value="20">
   <label>Estimated Quantity Bought</label>
   <input id="selectedQty" type="number" min="1" max="24" value="6">
+  <label><input type="checkbox" id="marginWithAdsToggle"> Show Profit Margin With Ads</label>
 
   <h3>Customer Discounts</h3>
   <div id="customerDiscountsContainer"></div>
@@ -150,7 +151,7 @@
 </div>
 <div class="right">
   <h2>Results</h2>
-<label><input type="checkbox" id="marginWithAdsToggle"> Show Profit Margin With Ads</label>
+
 
   
   <div class="metrics">
@@ -263,7 +264,7 @@ function updateGroupHeaders() {
       rev.colSpan = 5;
       cost.colSpan = 5;
     }
-    profit.colSpan = 2;
+    profit.colSpan = 3;
   }
 }
 

@@ -81,6 +81,15 @@
   <div id="freeShipContainer">
     <label>Free Shipping Threshold Amount</label>
     <input id="freeShip" value="30">
+    <label>
+      <input type="radio" name="freeShipMode" id="freeShipAfterDiscounts" checked>
+      Apply after item discounts (Shopify default)
+    </label>
+    <label>
+      <input type="radio" name="freeShipMode" id="freeShipBeforeDiscounts">
+      Apply before discounts (original cart value)
+    </label>
+
   </div>
   <label>Your shipping (first item)</label>
   <input id="shipFirst" value="5.09">
@@ -228,6 +237,8 @@ function handleVisibility() {
   if (!toggle || !container) return;
 
   container.style.display = toggle.checked ? "block" : "none";
+  let radios = document.querySelectorAll('input[name="freeShipMode"]');
+  radios.forEach(r => r.closest("label").style.display = toggle.checked ? "block" : "none");
 
   let batchToggle = document.getElementById("enableBatch");
   let batchContainer = document.getElementById("batchContainer");
@@ -408,7 +419,17 @@ document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
     }
 
     let freeShipEnabled = document.getElementById("freeShipToggle").checked;
-    let shippingRevenue = (freeShipEnabled && goodsRevenue >= freeShip) ? 0 : (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+    let usePreDiscount = document.getElementById("freeShipBeforeDiscounts")?.checked;
+
+let preDiscountItemsRevenue = n * price;
+
+let qualifiesForFreeShipping = usePreDiscount
+  ? preDiscountItemsRevenue >= freeShip
+  : goodsRevenue >= freeShip;
+
+let shippingRevenue = (freeShipEnabled && qualifiesForFreeShipping)
+  ? 0
+  : (shipCustomerFirst + (n - 1) * shipCustomerExtra);
     goodsRevenue = Math.max(0, goodsRevenue);
     
 let revenue = goodsRevenue + shippingRevenue;

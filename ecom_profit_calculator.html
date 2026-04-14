@@ -245,8 +245,13 @@ function updateGroupHeaders() {
   let taxIncluded = document.getElementById("taxIncluded")?.checked;
 
   if (rev && cost && profit) {
-    rev.colSpan = 5;
-    cost.colSpan = 5;
+    if (taxIncluded) {
+      rev.colSpan = 4;
+      cost.colSpan = 6;
+    } else {
+      rev.colSpan = 5;
+      cost.colSpan = 5;
+    }
     profit.colSpan = 2;
   }
 }
@@ -315,7 +320,7 @@ document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
       if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
         let groups = Math.floor(n / (d.bx + d.by));
         let discountUnits = groups * d.by;
-        let unitCostApprox = productCost / n;
+        let unitCostApprox = costSingle;
 
         if (d.discountType === "free") {
           productCost -= discountUnits * unitCostApprox;

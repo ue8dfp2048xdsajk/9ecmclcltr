@@ -73,19 +73,19 @@
 
   <h3>Product</h3>
   <label style="color:green;">Price per unit</label>
-  <input id="price" value="7.99">
+  <input id="price" value="" placeholder="e.g. 25.99">
   <label style="color:red;">Single unit cost</label>
-  <input id="costSingle" value="3.10">
+  <input id="costSingle" value="" placeholder="e.g. 7.99">
 
   <h3>Shipping</h3>
   <label style="color:green;">Customer shipping price (first item)</label>
-  <input id="shipCustomerFirst" value="4.99">
+  <input id="shipCustomerFirst" value="" placeholder="e.g. 4.99">
   <label style="color:green;">Customer shipping price (additional items)</label>
-  <input id="shipCustomerExtra" value="0.00">
-  <label><input type="checkbox" id="freeShipToggle" checked> Enable Free Shipping</label>
+  <input id="shipCustomerExtra" value="" placeholder="e.g. 1.99">
+  <label><input type="checkbox" id="freeShipToggle"> Enable Free Shipping</label>
   <div id="freeShipContainer">
     <label>Free Shipping Threshold Amount</label>
-    <input id="freeShip" value="30">
+    <input id="freeShip" value="" placeholder="e.g. 35">
     <label>
       <input type="radio" name="freeShipMode" id="freeShipAfterDiscounts" checked>
       Apply after item discounts (Shopify default)
@@ -97,15 +97,15 @@
 
   </div>
   <label style="color:red;">Your shipping (first item)</label>
-  <input id="shipFirst" value="5.09">
+  <input id="shipFirst" value="" placeholder="e.g. 4.99">
   <label style="color:red;">Your shipping (additional)</label>
-  <input id="shipExtra" value="0.07">
+  <input id="shipExtra" value="" placeholder="e.g. 1.99">
 
   <h3>Fees</h3>
   <label style="color:red;">Platform fee (%)</label>
-  <input id="platformFeePercent" placeholder="e.g. 2.9">
+  <input id="platformFeePercent" placeholder="e.g. 6.5">
   <label style="color:red;">Fixed fee per order</label>
-  <input id="fixedFee" placeholder="e.g. 0.30">
+  <input id="fixedFee" placeholder="e.g. 0.20">
   <label style="color:red;">Payment processor fee (%)</label>
   <input id="processorFeePercent" placeholder="e.g. 2.9">
   <label style="color:red;">Fulfilment & storage cost per unit</label>
@@ -113,15 +113,15 @@
 
   <h3>Tax</h3>
   <label>Tax rate (%)</label>
-  <input id="taxRate" value="20">
+  <input id="taxRate" value="" placeholder="e.g. 20">
   <label style="color:red;"><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
   <label><input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax</label>
 
   <h3>Ads</h3>
   <label>Estimated CPA</label>
-  <input id="cpa" value="20">
-  <label>Estimated Quantity Bought Per Order</label>
-  <input id="selectedQty" type="number" min="1" max="24" value="6">
+  <input id="cpa" value="" placeholder="e.g. 20">
+  <label>Estimated Quantity Bought</label>
+  <input id="selectedQty" type="number" min="1" max="24" value="" placeholder="e.g. 6">
   <label><input type="checkbox" id="marginWithAdsToggle"> Show Profit Margin With Ads</label>
 
   <h3>Customer Discounts</h3>
@@ -136,11 +136,11 @@
     <div style="display:flex; gap:10px;">
       <div style="flex:1;">
         <label>Batch cost</label>
-        <input id="costBatch" value="4.32">
+        <input id="costBatch" value="" placeholder="e.g. 4.32">
       </div>
       <div style="flex:1;">
         <label>Batch size</label>
-        <input id="batchSize" value="4">
+        <input id="batchSize" value="" placeholder="e.g. 4">
       </div>
     </div>
 
@@ -517,7 +517,7 @@ if (taxIncluded) {
     tbody.innerHTML += row;
   }
 
-  document.getElementById("breakEven").innerText = "$" + breakEvenCPA.toFixed(2);
+  document.getElementById("breakEven").innerText = breakEvenCPA.toFixed(2);
   
   document.getElementById("breakEvenROAS").innerText = breakEvenROAS ? breakEvenROAS.toFixed(2) + "x" : "-";
 }

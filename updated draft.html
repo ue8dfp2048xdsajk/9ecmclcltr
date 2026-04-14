@@ -85,7 +85,7 @@ td:not(:empty) { background: white; }
   <label style="color:green;">Customer shipping price (additional items)</label>
   <input id="shipCustomerExtra" value="" placeholder="e.g. 1.99">
   <label><input type="checkbox" id="freeShipToggle"> Enable Free Shipping</label>
-  <div id="freeShipContainer">
+  <div id="freeShipContainer" style="display:none;">
     <label>Free Shipping Threshold Amount</label>
     <input id="freeShip" value="" placeholder="e.g. 35">
     <label>
@@ -527,7 +527,7 @@ if (taxIncluded) {
       <td style="color:green;">${display(shippingRevenue, hasCustShip)}</td>
       <td style="color:gray; background:#f2f2f2;">${display(revenueBeforeDiscounts, hasAnyRevenue)}</td>
       <td style="color:green; font-weight:bold;">${display(revenue, hasAnyRevenue)}</td>
-      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${taxIncluded ? 'white' : '#f2f2f2'}; font-weight:normal;">${document.getElementById("taxRate").value === "" ? "" : display(taxIncluded ? taxValue : revenueWithTax, hasAnyRevenue)}</td>
+      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${document.getElementById("taxRate").value === "" ? "#f7f7f7" : (taxIncluded ? "white" : "#f2f2f2")}; font-weight:normal;">${document.getElementById("taxRate").value === "" ? "" : display(taxIncluded ? taxValue : revenueWithTax, hasAnyRevenue)}</td>
       <td style="color:red;">${display(productCost, hasCost)}</td>
       <td style="color:red;">${display(shippingCost, hasYourShip)}</td>
       <td style="color:red;">${display(fulfilmentCost, hasFulfilment)}</td>

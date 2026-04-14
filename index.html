@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecom Profit Calculator by Tia TX ©</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: #1a1a1a;
+}
+
+/* ── Header ── */
+header {
+  background: linear-gradient(135deg, #00bfa5 0%, #00897b 100%);
+  color: white;
+  padding: 18px 32px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  right: -5%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  position: relative;
+  z-index: 1;
+}
+header .subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 3px;
+  position: relative;
+  z-index: 1;
+  font-weight: 500;
+}
+
+/* ── Main layout ── */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Left Panel ── */
+.left {
+  width: 340px;
+  min-width: 260px;
+  flex-shrink: 0;
+  border-right: 2px solid #e5e7eb;
+  background: #fafafa;
+  overflow-y: auto;
+  padding: 16px 18px 48px 18px;
+}
+
+/* ── Right Panel ── */
+.right {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 48px 20px;
+  background: white;
+}
+
+/* ── Section Titles ── */
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #616161;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 8px;
+  margin: 20px 0 12px 0;
+}
+.section-title:first-child { margin-top: 0; }
+
+/* ── Labels ── */
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  margin-top: 10px;
+  color: #212121;
+}
+label.green { color: #2e7d32; }
+label.red   { color: #c62828; }
+
+/* ── Inputs & Selects ── */
+input, select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 8px;
+  background: #f5f5f5;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  display: block;
+  color: #212121;
+}
+input:not(:placeholder-shown) { background: white; }
+input:focus, select:focus {
+  outline: none;
+  border-color: #00bfa5;
+  box-shadow: 0 0 0 3px rgba(0,191,165,0.12);
+  background: white;
+}
+input[type="checkbox"], input[type="radio"] {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin: 0 6px 0 0;
+  accent-color: #00bfa5;
+  cursor: pointer;
+}
+select { background: white; cursor: pointer; }
+
+/* ── Checkbox label rows ── */
+.check-label {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #424242;
+  margin-bottom: 8px;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+/* ── Input pair ── */
+.input-pair { display: flex; gap: 10px; }
+.input-pair > div { flex: 1; }
+
+/* ── Buttons ── */
+button {
+  padding: 8px 14px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #00bfa5 0%, #00897b 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 4px rgba(0,191,165,0.2);
+}
+button:hover {
+  background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+  box-shadow: 0 4px 8px rgba(0,191,165,0.3);
+  transform: translateY(-1px);
+}
+button:active { transform: translateY(0); }
+.btn-full { width: 100%; margin-bottom: 4px; }
+.btn-neutral {
+  background: linear-gradient(135deg, #757575 0%, #616161 100%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.btn-neutral:hover {
+  background: linear-gradient(135deg, #616161 0%, #424242 100%);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.btn-danger {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  box-shadow: 0 2px 4px rgba(244,67,54,0.2);
+}
+.btn-danger:hover {
+  background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+  box-shadow: 0 4px 8px rgba(244,67,54,0.3);
+}
+
+/* ── Results header ── */
+.results-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #616161;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+/* ── Metrics Cards ── */
+.metrics { display: flex; gap: 16px; margin-bottom: 20px; }
+.card {
+  background: #f8f9fa;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  flex: 1;
+  text-align: center;
+}
+.card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #616161;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.card-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #212121;
+}
+
+/* ── Table wrapper ── */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  font-family: 'Inter', sans-serif;
+  display: table;
+  margin-bottom: 0;
+}
+th, td {
+  border: 1px solid #e0e0e0;
+  padding: 7px 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+th {
+  background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  position: sticky;
+  z-index: 2;
+  color: #424242;
+  border-bottom: 2px solid #d0d0d0;
+}
+thead tr:first-child th { top: 0; }
+thead tr:nth-child(2) th { top: 33px; }
+tbody td { background: #f9f9f9; }
+tbody td:not(:empty) { background: white; }
+tbody tr.highlight td:not(:empty) { background: #e6ffe6; }
+tbody tr.selectedRow td { outline: 2px solid #00bfa5; outline-offset: -2px; }
+tbody tr:hover td { filter: brightness(0.96); }
+
+/* ── Discount blocks ── */
+.customer-discount, .supplier-discount {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.discount-type-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  display: block;
+  color: #212121;
+}
+.customer-discount .discount-type-label { color: #c62828; }
+.supplier-discount .discount-type-label { color: #2e7d32; }
+.discount-btn-row { display: flex; gap: 6px; margin-top: 8px; }
+
+/* ── Tooltip ── */
+.tooltip { position: relative; display: inline-block; cursor: help; }
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 260px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 100;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 11px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <h1>Ecom Profit Calculator</h1>
+  <div class="subtitle">by Tia TX ©</div>
+</header>
+
+<!-- ── Main Layout ── -->
+<div class="main">
+
+  <!-- ── LEFT PANEL ── -->
+  <div class="left">
+
+    <div class="section-title">Product</div>
+    <label class="green">Price per unit</label>
+    <input id="price" placeholder="e.g. 25.99">
+    <label class="red">Single unit cost</label>
+    <input id="costSingle" placeholder="e.g. 7.99">
+
+    <div class="section-title">Shipping</div>
+    <label class="green">Customer shipping price (first item)</label>
+    <input id="shipCustomerFirst" placeholder="e.g. 4.99">
+    <label class="green">Customer shipping price (additional items)</label>
+    <input id="shipCustomerExtra" placeholder="e.g. 1.99">
+
+    <label class="check-label">
+      <input type="checkbox" id="freeShipToggle"> Enable Free Shipping
+    </label>
+
+    <div id="freeShipContainer" style="display:none; padding-left:4px;">
+      <label>Free Shipping Threshold Amount</label>
+      <input id="freeShip" placeholder="e.g. 35">
+      <label class="check-label">
+        <input type="radio" name="freeShipMode" id="freeShipAfterDiscounts" checked>
+        Apply after item discounts (Shopify default)
+      </label>
+      <label class="check-label">
+        <input type="radio" name="freeShipMode" id="freeShipBeforeDiscounts">
+        Apply before discounts (original cart value)
+      </label>
+    </div>
+
+    <label class="red">Your shipping (first item)</label>
+    <input id="shipFirst" placeholder="e.g. 4.99">
+    <label class="red">Your shipping (additional)</label>
+    <input id="shipExtra" placeholder="e.g. 1.99">
+
+    <div class="section-title">Fees</div>
+    <label class="red">Platform fee (%)</label>
+    <input id="platformFeePercent" placeholder="e.g. 6.5">
+    <label class="red">Fixed fee per order</label>
+    <input id="fixedFee" placeholder="e.g. 0.20">
+    <label class="red">Payment processor fee (%)</label>
+    <input id="processorFeePercent" placeholder="e.g. 2.9">
+    <label class="red">Fulfilment &amp; storage cost per unit</label>
+    <input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
+
+    <div class="section-title">Tax</div>
+    <label>Tax rate (%)</label>
+    <input id="taxRate" placeholder="e.g. 20">
+    <label class="check-label" style="color:#c62828;">
+      <input type="checkbox" id="taxIncluded"> Tax already included in price
+    </label>
+    <label class="check-label">
+      <input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax
+    </label>
+
+    <div class="section-title">Ads</div>
+    <label>Estimated CPA</label>
+    <input id="cpa" placeholder="e.g. 20">
+    <label>Estimated Quantity Bought</label>
+    <input id="selectedQty" type="number" min="1" max="24" placeholder="e.g. 6">
+    <label class="check-label">
+      <input type="checkbox" id="marginWithAdsToggle"> Show Profit Margin With Ads
+    </label>
+
+    <div class="section-title">Customer Discounts</div>
+    <div id="customerDiscountsContainer"></div>
+    <button class="btn-full" onclick="addCustomerDiscount()">+ Add Customer Discount</button>
+
+    <div class="section-title">Supplier Discounts</div>
+    <div id="supplierDiscountsContainer"></div>
+
+    <label class="check-label">
+      <input type="checkbox" id="enableBatch"> Enable Batch Pricing
+    </label>
+
+    <div id="batchContainer" style="display:none; padding-left:4px;">
+      <div class="input-pair">
+        <div>
+          <label>Batch cost</label>
+          <input id="costBatch" placeholder="e.g. 4.32">
+        </div>
+        <div>
+          <label>Batch size</label>
+          <input id="batchSize" placeholder="e.g. 4">
+        </div>
+      </div>
+      <label>Pricing Model</label>
+      <select id="pricingModel">
+        <option value="unit">Per Unit Pricing</option>
+        <option value="batch">Batch Production</option>
+      </select>
+    </div>
+
+    <button class="btn-full" style="margin-top:8px;" onclick="addSupplierDiscount()">+ Add Supplier Discount</button>
+
+  </div><!-- /left -->
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="right">
+
+    <div class="results-title">Results</div>
+
+    <div class="metrics">
+      <div class="card">
+        <div class="card-label">Max CPA (Break-even) At Selected Quantity</div>
+        <div class="card-value" id="breakEven">-</div>
+      </div>
+      <div class="card">
+        <div class="card-label">
+          ROAS Required to Break Even At Selected Quantity
+          <span class="tooltip">ⓘ
+            <span class="tooltiptext">Breakeven ROAS = 1 / (profit margin before ads)</span>
+          </span>
+        </div>
+        <div class="card-value" id="breakEvenROAS">-</div>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="table">
+        <thead>
+          <tr>
+            <th style="background:transparent;border:none;"></th>
+            <th id="revGroup" colspan="5" style="background:#e6ffe6; color:green;">Revenue</th>
+            <th id="costGroup" colspan="5" style="background:#ffe6e6; color:red;">Costs</th>
+            <th id="profitGroup" colspan="3" style="background:#fff3cd; color:#b8860b;">Profit / Loss</th>
+          </tr>
+          <tr>
+            <th style="color:#212121;">Quantity</th>
+            <th style="color:green; font-weight:normal;">Item Revenue</th>
+            <th style="color:green; font-weight:normal;">Shipping Revenue</th>
+            <th style="color:gray; font-weight:normal;">
+              <span style="color:gray;">Total Revenue Before Discounts</span>
+              <span class="tooltip" style="color:gray;">ⓘ
+                <span class="tooltiptext">This shows revenue before any item or shipping discounts are applied.</span>
+              </span>
+            </th>
+            <th style="color:green;">Total Revenue</th>
+            <th id="taxHeader" style="color:gray; font-weight:normal;">Revenue with Tax</th>
+            <th style="color:red; font-weight:normal;">Item Cost</th>
+            <th style="color:red; font-weight:normal;">Shipping Cost</th>
+            <th style="color:red; font-weight:normal;">Fulfilment &amp; Storage Fees</th>
+            <th style="color:red;">Total Cost (COGS)</th>
+            <th style="color:red; font-weight:normal;">Platform Fees</th>
+            <th style="color:#212121;">Profit</th>
+            <th style="color:#212121;">Profit After Ads At CPA</th>
+            <th id="profitMarginHeader" style="color:#212121;">Profit Margin Before Ads</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div><!-- /right -->
+
+</div><!-- /main -->
+
+<script>
+function calcBatchCost(n, costSingle, costBatch, batchSize) {
+  let batchEnabled = document.getElementById("enableBatch")?.checked;
+  if (!batchEnabled) return n * costSingle;
+  let model = document.getElementById("pricingModel").value;
+  if (model === "unit") {
+    if (n < batchSize) return n * costSingle;
+    let batches = Math.floor(n / batchSize);
+    let remainder = n % batchSize;
+    return batches * costBatch + remainder * costSingle;
+  }
+  let batches = Math.floor(n / batchSize);
+  let remainder = n % batchSize;
+  let cost = batches * costBatch;
+  if (remainder === 1) cost += costSingle;
+  else if (remainder > 1) cost += costBatch;
+  return cost;
+}
+
+function handleVisibility() {
+  let toggle = document.getElementById("freeShipToggle");
+  let container = document.getElementById("freeShipContainer");
+  if (!toggle || !container) return;
+  container.style.display = toggle.checked ? "block" : "none";
+  let radios = document.querySelectorAll('input[name="freeShipMode"]');
+  radios.forEach(r => r.closest("label").style.display = toggle.checked ? "block" : "none");
+  let batchToggle = document.getElementById("enableBatch");
+  let batchContainer = document.getElementById("batchContainer");
+  if (batchToggle && batchContainer) {
+    batchContainer.style.display = batchToggle.checked ? "block" : "none";
+  }
+}
+
+function updateGroupHeaders() {
+  let rev = document.getElementById("revGroup");
+  let cost = document.getElementById("costGroup");
+  let profit = document.getElementById("profitGroup");
+  let taxIncluded = document.getElementById("taxIncluded")?.checked;
+  if (rev && cost && profit) {
+    if (taxIncluded) { rev.colSpan = 4; cost.colSpan = 6; }
+    else { rev.colSpan = 5; cost.colSpan = 5; }
+    profit.colSpan = 3;
+  }
+}
+
+function update() {
+  let marginToggle = document.getElementById("marginWithAdsToggle");
+  let header = document.getElementById("profitMarginHeader");
+  if (header && marginToggle) {
+    header.innerText = marginToggle.checked ? "Profit Margin After Ads" : "Profit Margin Before Ads";
+  }
+
+  let price = parseFloat(document.getElementById("price").value) || 0;
+  let costSingle = parseFloat(document.getElementById("costSingle").value) || 0;
+  let costBatch = parseFloat(document.getElementById("costBatch").value) || 0;
+  let batchSize = Math.max(1, parseInt(document.getElementById("batchSize").value) || 1);
+  let shipCustomerFirst = parseFloat(document.getElementById("shipCustomerFirst").value) || 0;
+  let shipCustomerExtra = parseFloat(document.getElementById("shipCustomerExtra").value) || 0;
+  let freeShipInput = document.getElementById("freeShip").value;
+  let freeShip = freeShipInput === "" ? Infinity : parseFloat(freeShipInput);
+  let shipFirst = parseFloat(document.getElementById("shipFirst").value) || 0;
+  let shipExtra = parseFloat(document.getElementById("shipExtra").value) || 0;
+  let cpa = parseFloat(document.getElementById("cpa").value) || 0;
+
+  let tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
+
+  let taxIncluded = document.getElementById("taxIncluded").checked;
+  document.getElementById("taxHeader").innerText = taxIncluded ? "Tax Payable" : "Revenue with Tax";
+  document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
+
+  function display(val, condition) { return condition ? val.toFixed(2) : ""; }
+
+  let hasPrice = document.getElementById("price").value !== "";
+  let hasCost = document.getElementById("costSingle").value !== "" || document.getElementById("costBatch").value !== "";
+  let hasCustShip = document.getElementById("shipCustomerFirst").value !== "" || document.getElementById("shipCustomerExtra").value !== "";
+  let hasYourShip = document.getElementById("shipFirst").value !== "" || document.getElementById("shipExtra").value !== "";
+  let hasFulfilment = document.getElementById("fulfilmentPerUnit").value !== "";
+  let hasFees = document.getElementById("platformFeePercent").value !== "" || document.getElementById("processorFeePercent").value !== "" || document.getElementById("fixedFee").value !== "";
+  let hasAnyRevenue = hasPrice || hasCustShip;
+  let hasAnyCost = hasCost || hasYourShip || hasFulfilment;
+
+  let bestProfit = -Infinity;
+  let breakEvenCPA = 0;
+  let breakEvenROAS = 0;
+
+  for (let n = 1; n <= 24; n++) {
+    let productCost = calcBatchCost(n, costSingle, costBatch, batchSize);
+
+    let supplierDiscounts = [];
+    document.querySelectorAll("#supplierDiscountsContainer .supplier-discount").forEach(el => {
+      supplierDiscounts.push({
+        type: el.querySelector(".type").value,
+        bx: parseFloat(el.querySelector(".bx").value) || 0,
+        by: parseFloat(el.querySelector(".by").value) || 0,
+        discountType: el.querySelector(".bxyType").value,
+        value: parseFloat(el.querySelector(".value").value) || 0,
+        minType: "none", minValue: 0, stackable: true
+      });
+    });
+
+    for (let d of supplierDiscounts) {
+      let meetsMinSupp = true;
+      if (d.minType === "quantity") meetsMinSupp = n >= d.minValue;
+      if (d.minType === "amount") meetsMinSupp = productCost >= d.minValue;
+      if (!meetsMinSupp) continue;
+      if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
+        let groupSize = d.bx + d.by;
+        let groups = Math.floor(n / groupSize);
+        let remainder = n % groupSize;
+        let payableUnits = (groups * d.bx) + Math.min(remainder, d.bx);
+        productCost = calcBatchCost(payableUnits, costSingle, costBatch, batchSize);
+      }
+      if (d.type === "percent") productCost *= (1 - d.value / 100);
+      else if (d.type === "fixed") productCost = Math.max(0, productCost - d.value);
+      if (!d.stackable) break;
+    }
+
+    let shippingCost = shipFirst + (n - 1) * shipExtra;
+    let goodsRevenue = n * price;
+    let revenueBeforeDiscounts = (n * price) + (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+
+    let customerDiscounts = [];
+    document.querySelectorAll("#customerDiscountsContainer .customer-discount").forEach(el => {
+      customerDiscounts.push({
+        type: el.querySelector(".type").value,
+        bx: parseFloat(el.querySelector(".bx").value) || 0,
+        by: parseFloat(el.querySelector(".by").value) || 0,
+        discountType: el.querySelector(".bxyType").value,
+        value: parseFloat(el.querySelector(".value").value) || 0,
+        minType: "none", minValue: 0, stackable: true
+      });
+    });
+
+    for (let d of customerDiscounts) {
+      let meetsMin = true;
+      if (d.minType === "quantity") meetsMin = n >= d.minValue;
+      if (d.minType === "amount") meetsMin = goodsRevenue >= d.minValue;
+      if (!meetsMin) continue;
+      if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
+        let groupSize = d.bx + d.by;
+        let groups = Math.floor(n / groupSize);
+        let remainder = n % groupSize;
+        let payableUnits = (groups * d.bx) + Math.min(remainder, d.bx);
+        if (d.discountType === "free") goodsRevenue = payableUnits * price;
+        else if (d.discountType === "percent") goodsRevenue -= (n - payableUnits) * price * (d.value / 100);
+        else if (d.discountType === "fixed") goodsRevenue -= (n - payableUnits) * d.value;
+      }
+      if (d.type === "percent") goodsRevenue *= (1 - d.value / 100);
+      else if (d.type === "fixed") goodsRevenue = Math.max(0, goodsRevenue - d.value);
+      if (!d.stackable) break;
+    }
+
+    let freeShipEnabled = document.getElementById("freeShipToggle").checked;
+    let usePreDiscount = document.getElementById("freeShipBeforeDiscounts")?.checked;
+    let preDiscountItemsRevenue = n * price;
+    let qualifiesForFreeShipping = usePreDiscount ? preDiscountItemsRevenue >= freeShip : goodsRevenue >= freeShip;
+    let shippingRevenue = (freeShipEnabled && qualifiesForFreeShipping) ? 0 : (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+    goodsRevenue = Math.max(0, goodsRevenue);
+    let revenue = goodsRevenue + shippingRevenue;
+
+    let taxPercent = parseFloat(document.getElementById("taxRate").value) || 0;
+    let taxRate = taxPercent / 100;
+    let taxFraction = taxPercent / (100 + taxPercent);
+    let includeShippingInTax = document.getElementById("includeShippingInTax").checked;
+    let taxBase = includeShippingInTax ? revenue : goodsRevenue;
+    let taxValue = taxIncluded ? taxBase * taxFraction : taxBase * taxRate;
+    let revenueWithTax = taxIncluded ? revenue : (includeShippingInTax ? revenue * (1 + taxRate) : (goodsRevenue * (1 + taxRate) + shippingRevenue));
+
+    let platformPercent = parseFloat(document.getElementById("platformFeePercent").value) || 0;
+    let processorPercent = parseFloat(document.getElementById("processorFeePercent").value) || 0;
+    let fixedFee = parseFloat(document.getElementById("fixedFee").value) || 0;
+    let percentFees = revenue * (platformPercent / 100) + revenue * (processorPercent / 100);
+    let totalFees = percentFees + fixedFee;
+    let fulfilmentPerUnit = parseFloat(document.getElementById("fulfilmentPerUnit").value) || 0;
+    let fulfilmentCost = n * fulfilmentPerUnit;
+
+    productCost = Math.max(0, productCost);
+    let totalCost = productCost + shippingCost + fulfilmentCost;
+    let profit = revenue - totalCost - totalFees;
+    if (taxIncluded) profit -= taxValue;
+
+    let profitAfterAds = profit - cpa;
+    let marginWithAds = document.getElementById("marginWithAdsToggle").checked;
+    let profitMargin = revenue > 0 ? ((marginWithAds ? profitAfterAds : profit) / revenue) * 100 : 0;
+
+    if (profit > bestProfit) bestProfit = profit;
+    let selectedQty = parseInt(document.getElementById("selectedQty").value) || 1;
+    if (n === selectedQty) {
+      breakEvenCPA = Math.max(0, profit);
+      breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : null;
+    }
+
+    let taxRateValue = document.getElementById("taxRate").value;
+    let selectedQtyValue = document.getElementById("selectedQty").value;
+    let cpaValue = document.getElementById("cpa").value;
+
+    let row = `<tr class="${profit === bestProfit ? 'highlight' : ''} ${selectedQtyValue ? (n === selectedQty ? 'selectedRow' : '') : ''}">
+      <td>${n}</td>
+      <td style="color:green; background:${hasPrice ? "white" : "#f7f7f7"} !important;">${display(goodsRevenue, hasPrice)}</td>
+      <td style="color:green;">${display(shippingRevenue, hasCustShip)}</td>
+      <td style="color:gray; background:#f2f2f2;">${display(revenueBeforeDiscounts, hasAnyRevenue)}</td>
+      <td style="color:green; font-weight:bold;">${display(revenue, hasAnyRevenue)}</td>
+      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${taxRateValue === "" ? "#f7f7f7" : (taxIncluded ? "white" : "#f2f2f2")}; font-weight:normal;">${taxRateValue === "" ? "" : display(taxIncluded ? taxValue : revenueWithTax, hasAnyRevenue)}</td>
+      <td style="color:red;">${display(productCost, hasCost)}</td>
+      <td style="color:red;">${display(shippingCost, hasYourShip)}</td>
+      <td style="color:red;">${display(fulfilmentCost, hasFulfilment)}</td>
+      <td style="color:red; font-weight:bold;">${display(totalCost, hasAnyCost)}</td>
+      <td style="color:red;">${display(totalFees, hasFees)}</td>
+      ${(hasAnyRevenue || hasAnyCost) ? `<td style="color:${profit >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profit >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profit, true)}</td>` : `<td>${display(profit, false)}</td>`}
+      ${(hasAnyRevenue || hasAnyCost) ? (cpaValue === "" ? `<td></td>` : `<td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profitAfterAds, true)}</td>`) : `<td></td>`}
+      ${hasAnyRevenue ? `<td style="color:${profitMargin >= 0 ? 'green' : 'red'}; font-weight:bold;">${profitMargin.toFixed(2)}%</td>` : `<td></td>`}
+    </tr>`;
+
+    tbody.innerHTML += row;
+  }
+
+  document.getElementById("breakEven").innerText = document.getElementById("selectedQty").value === "" ? "-" : breakEvenCPA.toFixed(2);
+  document.getElementById("breakEvenROAS").innerText = document.getElementById("selectedQty").value === "" ? "-" : (breakEvenROAS ? breakEvenROAS.toFixed(2) + "x" : "-");
+}
+
+function getDiscountOptions(includeBXY) {
+  return includeBXY
+    ? `<option value="bxy">Buy X Get Y</option><option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`
+    : `<option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`;
+}
+
+function createDiscountBlock(type) {
+  let containerId = type === "customer" ? "customerDiscountsContainer" : "supplierDiscountsContainer";
+  let container = document.getElementById(containerId);
+  let bxyExists = false;
+  if (container) {
+    let blocks = container.querySelectorAll('.customer-discount, .supplier-discount');
+    bxyExists = Array.from(blocks).some(b => b.querySelector('.type')?.value === 'bxy');
+  }
+  let options = bxyExists
+    ? `<option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`
+    : `<option value="bxy">Buy X Get Y</option><option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`;
+
+  return `
+    <div class="${type}-discount">
+      <label class="discount-type-label">Type</label>
+      <select class="type">${options}</select>
+      <div class="bxy-fields">
+        <input class="bx" placeholder="Buy X">
+        <input class="by" placeholder="Get Y">
+        <select class="bxyType">
+          <option value="free">Free</option>
+          <option value="percent">% Off</option>
+          <option value="fixed">Amount Off</option>
+        </select>
+      </div>
+      <div class="value-field">
+        <input class="value" placeholder="Value">
+      </div>
+      <div class="discount-btn-row">
+        <button class="btn-neutral" onclick="moveUp(this)">&#8593;</button>
+        <button class="btn-neutral" onclick="moveDown(this)">&#8595;</button>
+        <button class="btn-danger" onclick="removeDiscount(this)">Remove</button>
+      </div>
+    </div>
+  `;
+}
+
+function updateDiscountVisibility(container) {
+  container.querySelectorAll('.customer-discount, .supplier-discount').forEach(block => {
+    let type = block.querySelector('.type').value;
+    let bxyFields = block.querySelector('.bxy-fields');
+    let valueField = block.querySelector('.value-field');
+    let bxyType = block.querySelector('.bxyType')?.value;
+    if (type === 'bxy') {
+      bxyFields.style.display = 'block';
+      valueField.style.display = bxyType === 'free' ? 'none' : 'block';
+    } else {
+      bxyFields.style.display = 'none';
+      valueField.style.display = 'block';
+    }
+  });
+}
+
+function enforceSingleBXY(containerId) {
+  let container = document.getElementById(containerId);
+  if (!container) return;
+  let blocks = container.querySelectorAll('.customer-discount, .supplier-discount');
+  let bxyExists = Array.from(blocks).some(b => b.querySelector('.type')?.value === 'bxy');
+  blocks.forEach(block => {
+    let select = block.querySelector('.type');
+    let currentValue = select.value;
+    let shouldIncludeBXY = !bxyExists || currentValue === 'bxy';
+    select.innerHTML = getDiscountOptions(shouldIncludeBXY);
+    if (shouldIncludeBXY || currentValue !== 'bxy') select.value = currentValue;
+    else select.value = 'percent';
+  });
+}
+
+function runBXYEnforcement() {
+  enforceSingleBXY('customerDiscountsContainer');
+  enforceSingleBXY('supplierDiscountsContainer');
+}
+
+function addCustomerDiscount() {
+  document.getElementById('customerDiscountsContainer').insertAdjacentHTML('beforeend', createDiscountBlock('customer'));
+  updateDiscountVisibility(document);
+  runBXYEnforcement();
+}
+
+function addSupplierDiscount() {
+  document.getElementById('supplierDiscountsContainer').insertAdjacentHTML('beforeend', createDiscountBlock('supplier'));
+  updateDiscountVisibility(document);
+  runBXYEnforcement();
+}
+
+function removeDiscount(btn) {
+  btn.closest('.customer-discount, .supplier-discount').remove();
+  updateGroupHeaders();
+  update();
+  runBXYEnforcement();
+}
+
+function moveUp(btn) {
+  let el = btn.closest('.customer-discount, .supplier-discount');
+  let prev = el.previousElementSibling;
+  if (prev) el.parentNode.insertBefore(el, prev);
+  updateGroupHeaders();
+  update();
+  runBXYEnforcement();
+}
+
+function moveDown(btn) {
+  let el = btn.closest('.customer-discount, .supplier-discount');
+  let next = el.nextElementSibling;
+  if (next) el.parentNode.insertBefore(next, el);
+  updateGroupHeaders();
+  update();
+  runBXYEnforcement();
+}
+
+document.addEventListener('change', function(e) {
+  if (e.target.classList.contains('bxyType') || e.target.classList.contains('type')) {
+    updateDiscountVisibility(document);
+    runBXYEnforcement();
+  }
+  if (e.target.classList.contains('type')) {
+    enforceSingleBXY('customerDiscountsContainer');
+    enforceSingleBXY('supplierDiscountsContainer');
+  }
+});
+
+document.addEventListener('input', function(e) {
+  if (e.target.closest('#customerDiscountsContainer') || e.target.closest('#supplierDiscountsContainer')) {
+    updateGroupHeaders();
+    update();
+  }
+});
+
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('change', updateGroupHeaders);
+  el.addEventListener('change', handleVisibility);
+  el.addEventListener('input', update);
+});
+
+handleVisibility();
+updateGroupHeaders();
+update();
+</script>
+</body>
+</html>

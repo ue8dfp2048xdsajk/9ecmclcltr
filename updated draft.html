@@ -58,6 +58,11 @@
   visibility: visible;
   opacity: 1;
 }
+
+.discount-type-label { color: black; }
+.customer-discount .discount-type-label { color: red; }
+.supplier-discount .discount-type-label { color: green; }
+
 </style>
 
 </head>
@@ -67,15 +72,15 @@
   <h2>Inputs</h2>
 
   <h3>Product</h3>
-  <label>Price per unit</label>
+  <label style="color:green;">Price per unit</label>
   <input id="price" value="7.99">
-  <label>Single unit cost</label>
+  <label style="color:red;">Single unit cost</label>
   <input id="costSingle" value="3.10">
 
   <h3>Shipping</h3>
-  <label>Customer shipping price (first item)</label>
+  <label style="color:green;">Customer shipping price (first item)</label>
   <input id="shipCustomerFirst" value="4.99">
-  <label>Customer shipping price (additional items)</label>
+  <label style="color:green;">Customer shipping price (additional items)</label>
   <input id="shipCustomerExtra" value="0.00">
   <label><input type="checkbox" id="freeShipToggle" checked> Enable Free Shipping</label>
   <div id="freeShipContainer">
@@ -91,25 +96,25 @@
     </label>
 
   </div>
-  <label>Your shipping (first item)</label>
+  <label style="color:red;">Your shipping (first item)</label>
   <input id="shipFirst" value="5.09">
-  <label>Your shipping (additional)</label>
+  <label style="color:red;">Your shipping (additional)</label>
   <input id="shipExtra" value="0.07">
 
   <h3>Fees</h3>
-  <label>Platform fee (%)</label>
+  <label style="color:red;">Platform fee (%)</label>
   <input id="platformFeePercent" placeholder="e.g. 2.9">
-  <label>Fixed fee per order</label>
+  <label style="color:red;">Fixed fee per order</label>
   <input id="fixedFee" placeholder="e.g. 0.30">
-  <label>Payment processor fee (%)</label>
+  <label style="color:red;">Payment processor fee (%)</label>
   <input id="processorFeePercent" placeholder="e.g. 2.9">
-  <label>Fulfilment & storage cost per unit</label>
+  <label style="color:red;">Fulfilment & storage cost per unit</label>
   <input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
 
   <h3>Tax</h3>
   <label>Tax rate (%)</label>
   <input id="taxRate" value="20">
-  <label><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
+  <label style="color:red;"><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
   <label><input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax</label>
 
   <h3>Ads</h3>
@@ -550,7 +555,7 @@ function createDiscountBlock(type) {
 
   return `
     <div class="${type}-discount">
-      <label>Type</label>
+      <label class="discount-type-label">Type</label>
       <select class="type">
         ${options}
       </select>

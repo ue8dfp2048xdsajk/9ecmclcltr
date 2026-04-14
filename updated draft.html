@@ -9,14 +9,16 @@
   .left { width: 35%; border-right: 1px solid #ddd; background: #f9f9f9; }
   .right { width: 65%; }
   h2 { margin-top: 0; }
-  input { width: 100%; padding: 6px; margin-bottom: 10px; }
+  input { width: 100%; padding: 6px; margin-bottom: 10px; background:#f2f2f2; }
+input:not(:placeholder-shown) { background:#ffffff; }
   table { width: 100%; border-collapse: collapse; margin-top: 20px; }
   th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
   th { background: #eee; }
   .highlight { background: #e6ffe6; }
 .selectedRow { outline: 2px solid #999; }
   .greenCol { background: #e6ffe6; }
-  td { background: white; }
+  td { background: #f7f7f7; }
+td:not(:empty) { background: white; }
   .metrics { display: flex; gap: 20px; }
   .card { background: #f1f1f1; padding: 10px; border-radius: 8px; flex: 1; text-align: center; }
 
@@ -513,7 +515,7 @@ if (taxIncluded) {
 
     let row = `<tr class="${profit === bestProfit ? 'highlight' : ''} ${document.getElementById("selectedQty").value ? (n === selectedQty ? 'selectedRow' : '') : ''}">
       <td>${n}</td>
-      <td style="color:green;">${display(goodsRevenue, hasPrice)}</td>
+      <td style="color:green; background:${hasPrice ? "white" : "#f7f7f7"} !important;">${display(goodsRevenue, hasPrice)}</td>
       <td style="color:green;">${display(shippingRevenue, hasCustShip)}</td>
       <td style="color:gray; background:#f2f2f2;">${display(revenueBeforeDiscounts, hasAnyRevenue)}</td>
       <td style="color:green; font-weight:bold;">${display(revenue, hasAnyRevenue)}</td>
@@ -523,15 +525,15 @@ if (taxIncluded) {
       <td style="color:red;">${display(fulfilmentCost, hasFulfilment)}</td>
       <td style="color:red; font-weight:bold;">${display(totalCost, hasAnyCost)}</td>
       <td style="color:red;">${display(totalFees, hasFees)}</td>
-      <td style="color:${profit >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profit >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profit, hasAnyRevenue || hasAnyCost)}</td>
-      <td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profitAfterAds, hasAnyRevenue || hasAnyCost)}</td>
-      <td style="color:${profitMargin >= 0 ? 'green' : 'red'}; font-weight:bold;">${hasAnyRevenue ? profitMargin.toFixed(2) + '%' : ''}</td>
+      ${(hasAnyRevenue || hasAnyCost) ? `<td style="color:${profit >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profit >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profit, true)}</td>` : `<td>${display(profit, false)}</td>`}
+      ${(hasAnyRevenue || hasAnyCost) ? `<td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profitAfterAds, true)}</td>` : `<td>${display(profitAfterAds, false)}</td>`}
+      ${hasAnyRevenue ? `<td style="color:${profitMargin >= 0 ? 'green' : 'red'}; font-weight:bold;">${profitMargin.toFixed(2)}%</td>` : `<td></td>`}
     </tr>`;
 
     tbody.innerHTML += row;
   }
 
-  document.getElementById("breakEven").innerText = breakEvenCPA.toFixed(2);
+  document.getElementById("breakEven").innerText = document.getElementById("cpa").value === "" ? "-" : breakEvenCPA.toFixed(2);
   
   document.getElementById("breakEvenROAS").innerText = breakEvenROAS ? breakEvenROAS.toFixed(2) + "x" : "-";
 }

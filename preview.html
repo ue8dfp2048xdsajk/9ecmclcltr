@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ecom Profit Calculator</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; }
+  .left, .right { padding: 20px; overflow-y: auto; }
+  .left { width: 35%; border-right: 1px solid #ddd; background: #f9f9f9; }
+  .right { width: 65%; }
+  h2 { margin-top: 0; }
+  input { width: 100%; padding: 6px; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
+  th { background: #eee; }
+  .highlight { background: #e6ffe6; }
+.selectedRow { outline: 2px solid #999; }
+  .greenCol { background: #e6ffe6; }
+  td { background: white; }
+  .metrics { display: flex; gap: 20px; }
+  .card { background: #f1f1f1; padding: 10px; border-radius: 8px; flex: 1; text-align: center; }
+
+  select {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  label {
+    display: block;
+    margin-top: 8px;
+    font-weight: bold;
+  }
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 260px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  padding: 6px;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+</style>
+
+</head>
+<body>
+
+<div class="left">
+  <h2>Inputs</h2>
+
+  <h3>Product</h3>
+  <label>Price per unit</label>
+  <input id="price" value="7.99">
+  <label>Single unit cost</label>
+  <input id="costSingle" value="3.10">
+
+  <h3>Shipping</h3>
+  <label>Customer shipping price (first item)</label>
+  <input id="shipCustomerFirst" value="4.99">
+  <label>Customer shipping price (additional items)</label>
+  <input id="shipCustomerExtra" value="0.00">
+  <label><input type="checkbox" id="freeShipToggle" checked> Enable Free Shipping</label>
+  <div id="freeShipContainer">
+    <label>Free Shipping Threshold Amount</label>
+    <input id="freeShip" value="30">
+    <label>
+      <input type="radio" name="freeShipMode" id="freeShipAfterDiscounts" checked>
+      Apply after item discounts (Shopify default)
+    </label>
+    <label>
+      <input type="radio" name="freeShipMode" id="freeShipBeforeDiscounts">
+      Apply before discounts (original cart value)
+    </label>
+
+  </div>
+  <label>Your shipping (first item)</label>
+  <input id="shipFirst" value="5.09">
+  <label>Your shipping (additional)</label>
+  <input id="shipExtra" value="0.07">
+
+  <h3>Fees</h3>
+  <label>Platform fee (%)</label>
+  <input id="platformFeePercent" placeholder="e.g. 2.9">
+  <label>Fixed fee per order</label>
+  <input id="fixedFee" placeholder="e.g. 0.30">
+  <label>Payment processor fee (%)</label>
+  <input id="processorFeePercent" placeholder="e.g. 2.9">
+  <label>Fulfilment & storage cost per unit</label>
+  <input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
+
+  <h3>Tax</h3>
+  <label>Tax rate (%)</label>
+  <input id="taxRate" value="20">
+  <label><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
+  <label><input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax</label>
+
+  <h3>Ads</h3>
+  <label>Estimated CPA</label>
+  <input id="cpa" value="20">
+  <label>Estimated Quantity Bought</label>
+  <input id="selectedQty" type="number" min="1" max="24" value="6">
+  <label><input type="checkbox" id="marginWithAdsToggle"> Show Profit Margin With Ads</label>
+
+  <h3>Customer Discounts</h3>
+  <div id="customerDiscountsContainer"></div>
+  <button onclick="addCustomerDiscount()">+ Add Customer Discount</button>
+
+  <h3>Supplier Discounts</h3>
+  <div id="supplierDiscountsContainer"></div>
+
+  <label><input type="checkbox" id="enableBatch"> Enable Batch Pricing</label>
+  <div id="batchContainer" style="display:none;">
+    <div style="display:flex; gap:10px;">
+      <div style="flex:1;">
+        <label>Batch cost</label>
+        <input id="costBatch" value="4.32">
+      </div>
+      <div style="flex:1;">
+        <label>Batch size</label>
+        <input id="batchSize" value="4">
+      </div>
+    </div>
+
+    <label>Pricing Model</label>
+    <select id="pricingModel">
+      <option value="unit">Per Unit Pricing</option>
+      <option value="batch">Batch Production</option>
+    </select>
+  </div>
+
+  <button onclick="addSupplierDiscount()">+ Add Supplier Discount</button>
+
+</div>
+<div class="right">
+  <h2>Results</h2>
+
+
+  
+  <div class="metrics">
+    <div class="card">
+      <div>Max CPA (Break-even) At Estimated Quantity Bought</div>
+      <div id="breakEven">-</div>
+    </div>
+    <div class="card">
+      <div>Break-even ROAS At Estimated Quantity Bought</div>
+      <div id="breakEvenROAS">-</div>
+    </div>
+    
+  </div>
+
+  <table id="table">
+    <thead>
+      <tr>
+        <th style="background:transparent;border:none;"></th>
+        <th id="revGroup" colspan="5" style="background:#e6ffe6; color:green;">Revenue</th>
+        <th id="costGroup" colspan="5" style="background:#ffe6e6; color:red;">Costs</th>
+        <th id="profitGroup" colspan="3" style="background:#fff3cd; color:#b8860b;">Profit / Loss</th>
+      </tr>
+      <tr>
+        <th style="color:black;">Quantity</th>
+        <th style="color:green; font-weight:normal;">Item Revenue</th>
+        <th style="color:green; font-weight:normal;">Shipping Revenue</th>
+        <th style="color:green; font-weight:normal;">
+  <span style="color:gray;">Total Revenue Before Discounts</span> 
+  <span class="tooltip" style="color:gray;">ⓘ
+    <span class="tooltiptext">
+      This shows revenue before any item or shipping discounts are applied.
+    </span>
+  </span>
+</th>
+        <th style="color:green;">Total Revenue</th><th id="taxHeader" style="color:purple; font-weight:normal;">Revenue with Tax</th>
+        <th style="color:red; font-weight:normal;">Item Cost</th>
+        <th style="color:red; font-weight:normal;">Shipping Cost</th>
+        <th style="color:red; font-weight:normal;">Fulfilment & Storage Fees</th>
+        <th style="color:red;">Total Cost (COGS + Shipping + Fulfilment)</th>
+        <th style="color:red; font-weight:normal;">Platform Fees</th>
+        <th style="color:black;">Profit</th>
+        <th style="color:black;">Profit After Ads At Estimated CPA</th>
+        <th style="color:black;">Profit Margin %</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+function calcBatchCost(n, costSingle, costBatch, batchSize) {
+  let batchEnabled = document.getElementById("enableBatch")?.checked;
+
+  // If batch pricing is NOT enabled, always use single unit cost
+  if (!batchEnabled) {
+    return n * costSingle;
+  }
+
+  let model = document.getElementById("pricingModel").value;
+
+  // Per unit pricing
+  if (model === "unit") {
+    if (n < batchSize) return n * costSingle;
+    let batches = Math.floor(n / batchSize);
+    let remainder = n % batchSize;
+    return batches * costBatch + remainder * costSingle;
+  }
+
+  // Batch production
+  let batches = Math.floor(n / batchSize);
+  let remainder = n % batchSize;
+  let cost = batches * costBatch;
+
+  if (remainder === 1) cost += costSingle;
+  else if (remainder > 1) cost += costBatch;
+
+  return cost;
+}
+
+
+function handleVisibility() {
+  let toggle = document.getElementById("freeShipToggle");
+  let container = document.getElementById("freeShipContainer");
+  if (!toggle || !container) return;
+
+  container.style.display = toggle.checked ? "block" : "none";
+  let radios = document.querySelectorAll('input[name="freeShipMode"]');
+  radios.forEach(r => r.closest("label").style.display = toggle.checked ? "block" : "none");
+
+  let batchToggle = document.getElementById("enableBatch");
+  let batchContainer = document.getElementById("batchContainer");
+  if (batchToggle && batchContainer) {
+    batchContainer.style.display = batchToggle.checked ? "block" : "none";
+  }
+}
+
+
+// Dynamic column grouping (future-proof)
+function updateGroupHeaders() {
+  let rev = document.getElementById("revGroup");
+  let cost = document.getElementById("costGroup");
+  let profit = document.getElementById("profitGroup");
+  let taxIncluded = document.getElementById("taxIncluded")?.checked;
+
+  if (rev && cost && profit) {
+    if (taxIncluded) {
+      rev.colSpan = 4;
+      cost.colSpan = 6;
+    } else {
+      rev.colSpan = 5;
+      cost.colSpan = 5;
+    }
+    profit.colSpan = 3;
+  }
+}
+
+function update() {
+  let price = parseFloat(document.getElementById("price").value) || 0;
+  let costSingle = parseFloat(document.getElementById("costSingle").value) || 0;
+  let costBatch = parseFloat(document.getElementById("costBatch").value) || 0;
+  let batchSize = Math.max(1, parseInt(document.getElementById("batchSize").value) || 1);
+
+  let shipCustomerFirst = parseFloat(document.getElementById("shipCustomerFirst").value) || 0;
+  let shipCustomerExtra = parseFloat(document.getElementById("shipCustomerExtra").value) || 0;
+  let freeShip = parseFloat(document.getElementById("freeShip").value) || 0;
+
+  let shipFirst = parseFloat(document.getElementById("shipFirst").value) || 0;
+  let shipExtra = parseFloat(document.getElementById("shipExtra").value) || 0;
+
+  let cpa = parseFloat(document.getElementById("cpa").value) || 0;
+
+  let tbody = document.querySelector("#table tbody");
+  
+tbody.innerHTML = "";
+let taxIncluded = document.getElementById("taxIncluded").checked;
+document.getElementById("taxHeader").innerText = taxIncluded ? "Tax Payable" : "Revenue with Tax";
+document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
+
+
+  let bestProfit = -Infinity;
+  let breakEvenCPA = 0;
+  let breakEvenROAS = 0;
+
+  for (let n = 1; n <= 24; n++) {
+    
+    let productCost = calcBatchCost(n, costSingle, costBatch, batchSize);
+
+    // SUPPLIER DISCOUNTS
+
+    let supplierDiscounts = [];
+    document.querySelectorAll("#supplierDiscountsContainer .supplier-discount").forEach(el => {
+      supplierDiscounts.push({
+        type: el.querySelector(".type").value,
+        bx: parseFloat(el.querySelector(".bx").value) || 0,
+        by: parseFloat(el.querySelector(".by").value) || 0,
+        discountType: el.querySelector(".bxyType").value,
+        value: parseFloat(el.querySelector(".value").value) || 0,
+        minType: "none",
+        minValue: 0,
+        stackable: true
+      });
+    });
+    if (supplierDiscounts.length === 0) { supplierDiscounts = []; }
+
+    let nonStackSupp = false;
+
+    for (let d of supplierDiscounts) {
+
+      let meetsMinSupp = true;
+      if (d.minType === "quantity") meetsMinSupp = n >= d.minValue;
+      if (d.minType === "amount") meetsMinSupp = productCost >= d.minValue;
+      if (!meetsMinSupp) continue;
+
+      if (!d.stackable) {
+        nonStackSupp = true;
+      }
+
+      if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
+        let groupSize = d.bx + d.by;
+        let groups = Math.floor(n / groupSize);
+        let remainder = n % groupSize;
+
+        let payableUnits = (groups * d.bx) + Math.min(remainder, d.bx);
+
+        // FIX: recalculate cost based on payable units
+        productCost = calcBatchCost(payableUnits, costSingle, costBatch, batchSize);
+      }
+
+      if (d.type === "percent") {
+        productCost *= (1 - d.value / 100);
+      } else if (d.type === "fixed") {
+        productCost = Math.max(0, productCost - d.value);
+      }
+
+      if (!d.stackable) break;
+    }
+
+    let shippingCost = shipFirst + (n - 1) * shipExtra;
+
+    
+    // CUSTOMER DISCOUNTS
+
+    let chargedQty = n;
+    let goodsRevenue = n * price;
+
+    let revenueBeforeDiscounts = (n * price) + (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+
+    // Build customer discounts array
+    let customerDiscounts = [];
+
+    document.querySelectorAll("#customerDiscountsContainer .customer-discount").forEach(el => {
+      customerDiscounts.push({
+        type: el.querySelector(".type").value,
+        bx: parseFloat(el.querySelector(".bx").value) || 0,
+        by: parseFloat(el.querySelector(".by").value) || 0,
+        discountType: el.querySelector(".bxyType").value,
+        value: parseFloat(el.querySelector(".value").value) || 0,
+        minType: "none",
+        minValue: 0,
+        stackable: true
+      });
+    });
+
+    let nonStackApplied = false;
+
+    for (let d of customerDiscounts) {
+
+      // check minimum
+      let meetsMin = true;
+      if (d.minType === "quantity") meetsMin = n >= d.minValue;
+      if (d.minType === "amount") meetsMin = goodsRevenue >= d.minValue;
+      if (!meetsMin) continue;
+
+      if (!d.stackable) {
+        // Apply ONLY this discount and ignore all others
+        nonStackApplied = true;
+      }
+
+      // APPLY LOGIC
+      if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
+        let groupSize = d.bx + d.by;
+        let groups = Math.floor(n / groupSize);
+        let remainder = n % groupSize;
+
+        // customer only pays for X per group + remainder capped at X
+        let payableUnits = (groups * d.bx) + Math.min(remainder, d.bx);
+
+        if (d.discountType === "free") {
+          goodsRevenue = payableUnits * price;
+        } else if (d.discountType === "percent") {
+          let discountUnits = n - payableUnits;
+          goodsRevenue -= discountUnits * price * (d.value / 100);
+        } else if (d.discountType === "fixed") {
+          let discountUnits = n - payableUnits;
+          goodsRevenue -= discountUnits * d.value;
+        }
+      }
+
+      if (d.type === "percent") {
+        goodsRevenue *= (1 - d.value / 100);
+      } else if (d.type === "fixed") {
+        goodsRevenue = Math.max(0, goodsRevenue - d.value);
+      }
+
+      if (!d.stackable) break;
+    }
+
+    let freeShipEnabled = document.getElementById("freeShipToggle").checked;
+    let usePreDiscount = document.getElementById("freeShipBeforeDiscounts")?.checked;
+
+let preDiscountItemsRevenue = n * price;
+
+let qualifiesForFreeShipping = usePreDiscount
+  ? preDiscountItemsRevenue >= freeShip
+  : goodsRevenue >= freeShip;
+
+let shippingRevenue = (freeShipEnabled && qualifiesForFreeShipping)
+  ? 0
+  : (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+    goodsRevenue = Math.max(0, goodsRevenue);
+    
+let revenue = goodsRevenue + shippingRevenue;
+
+// TAX LOGIC
+let taxPercent = parseFloat(document.getElementById("taxRate").value) || 0;
+let taxRate = taxPercent / 100;
+let taxFraction = taxPercent / (100 + taxPercent);
+
+let taxIncluded = document.getElementById("taxIncluded").checked;
+let includeShippingInTax = document.getElementById("includeShippingInTax").checked;
+
+let taxBase = includeShippingInTax ? revenue : goodsRevenue;
+
+let taxValue = taxIncluded 
+  ? taxBase * taxFraction   // VAT extraction
+  : taxBase * taxRate;      // added on top
+
+let revenueWithTax = taxIncluded 
+  ? revenue 
+  : (includeShippingInTax ? revenue * (1 + taxRate) : (goodsRevenue * (1 + taxRate) + shippingRevenue));
+
+
+    // PLATFORM FEES
+    let platformPercent = parseFloat(document.getElementById("platformFeePercent").value) || 0;
+    let processorPercent = parseFloat(document.getElementById("processorFeePercent").value) || 0;
+    let fixedFee = parseFloat(document.getElementById("fixedFee").value) || 0;
+
+    let percentFees = revenue * (platformPercent / 100) + revenue * (processorPercent / 100);
+    let totalFees = percentFees + fixedFee;
+
+    let fulfilmentPerUnit = parseFloat(document.getElementById("fulfilmentPerUnit").value) || 0;
+    let fulfilmentCost = n * fulfilmentPerUnit;
+
+
+    productCost = Math.max(0, productCost);
+    let totalCost = productCost + shippingCost + fulfilmentCost;
+    let profit = revenue - totalCost - totalFees;
+
+// Subtract tax when it's already included in price (VAT mode)
+if (taxIncluded) {
+  profit -= taxValue;
+}
+    let profitAfterAds = profit - cpa;
+    let marginWithAds = document.getElementById("marginWithAdsToggle").checked;
+    let profitMargin = revenue > 0 ? ((marginWithAds ? profitAfterAds : profit) / revenue) * 100 : 0;
+
+    if (profit > bestProfit) bestProfit = profit;
+    let selectedQty = parseInt(document.getElementById("selectedQty").value) || 1;
+    if (n === selectedQty) {
+      breakEvenCPA = Math.max(0, profit);
+      breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : null;
+    }
+
+    let row = `<tr class="${profit === bestProfit ? 'highlight' : ''} ${document.getElementById("selectedQty").value ? (n === selectedQty ? 'selectedRow' : '') : ''}">
+      <td>${n}</td>
+      <td style="color:green;">${goodsRevenue.toFixed(2)}</td>
+      <td style="color:green;">${shippingRevenue.toFixed(2)}</td>
+      <td style="color:gray; background:#f2f2f2;">${revenueBeforeDiscounts.toFixed(2)}</td>
+      <td style="color:green; font-weight:bold;">${revenue.toFixed(2)}</td>
+      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${taxIncluded ? 'white' : '#f2f2f2'}; font-weight:normal;">${taxIncluded ? taxValue.toFixed(2) : revenueWithTax.toFixed(2)}</td>
+      <td style="color:red;">${productCost.toFixed(2)}</td>
+      <td style="color:red;">${shippingCost.toFixed(2)}</td>
+      <td style="color:red;">${fulfilmentCost.toFixed(2)}</td>
+      <td style="color:red; font-weight:bold;">${totalCost.toFixed(2)}</td>
+      <td style="color:red;">${totalFees.toFixed(2)}</td>
+      <td style="color:${profit >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profit >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profit.toFixed(2)}</td>
+      <td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profitAfterAds.toFixed(2)}</td>
+      <td style="color:${profitMargin >= 0 ? 'green' : 'red'}; font-weight:bold;">${profitMargin.toFixed(2)}%</td>
+    </tr>`;
+
+    tbody.innerHTML += row;
+  }
+
+  document.getElementById("breakEven").innerText = "$" + breakEvenCPA.toFixed(2);
+  
+  document.getElementById("breakEvenROAS").innerText = breakEvenROAS ? breakEvenROAS.toFixed(2) + "x" : "-";
+}
+
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("change", updateGroupHeaders);
+  el.addEventListener("change", handleVisibility);
+  el.addEventListener("input", update);
+});
+
+handleVisibility();
+updateGroupHeaders();
+update();
+
+
+function createDiscountBlock(type) {
+
+  // Check if BXY already exists in this section
+  let containerId = type === "customer" ? "customerDiscountsContainer" : "supplierDiscountsContainer";
+  let container = document.getElementById(containerId);
+
+  let bxyExists = false;
+  if (container) {
+    let blocks = container.querySelectorAll('.customer-discount, .supplier-discount');
+    bxyExists = Array.from(blocks).some(b => b.querySelector('.type')?.value === 'bxy');
+  }
+
+  // If BXY already exists → hide it from new dropdown
+  let options = bxyExists 
+    ? `<option value="percent">% Discount</option>
+       <option value="fixed">Fixed Discount</option>`
+    : `<option value="bxy">Buy X Get Y</option>
+       <option value="percent">% Discount</option>
+       <option value="fixed">Fixed Discount</option>`;
+
+  return `
+    <div class="${type}-discount">
+      <label>Type</label>
+      <select class="type">
+        ${options}
+      </select>
+
+      <div class="bxy-fields">
+        <input class="bx" placeholder="Buy X">
+        <input class="by" placeholder="Get Y">
+
+        <select class="bxyType">
+        <option value="free">Free</option>
+        <option value="percent">% Off</option>
+        <option value="fixed">Amount Off</option>
+      </select>
+      </div>
+
+      <div class="value-field">
+        <input class="value" placeholder="Value">
+      </div>
+
+      <div style="display:flex; gap:6px; margin:6px 0;">
+        <button onclick="moveUp(this)">↑</button>
+        <button onclick="moveDown(this)">↓</button>
+        <button onclick="removeDiscount(this)" style="color:red;">✕</button>
+      </div>
+      <hr>
+    </div>
+  `;
+}
+
+
+
+// Handle dynamic discount visibility
+function updateDiscountVisibility(container) {
+  container.querySelectorAll(".customer-discount, .supplier-discount").forEach(block => {
+    let type = block.querySelector(".type").value;
+    let bxyFields = block.querySelector(".bxy-fields");
+    let valueField = block.querySelector(".value-field");
+    let bxyType = block.querySelector(".bxyType")?.value;
+
+    // Show/hide BXY fields
+    if (type === "bxy") {
+      bxyFields.style.display = "block";
+
+      // Hide value if FREE
+      if (bxyType === "free") {
+        valueField.style.display = "none";
+      } else {
+        valueField.style.display = "block";
+      }
+
+    } else {
+      bxyFields.style.display = "none";
+      valueField.style.display = "block";
+    }
+  });
+}
+
+// Hook into changes
+document.addEventListener("change", function(e) {
+  if (e.target.classList.contains("bxyType")) {
+    updateDiscountVisibility(document);
+  runBXYEnforcement();
+  }
+  if (e.target.classList.contains("type")) {
+    updateDiscountVisibility(document);
+  runBXYEnforcement();
+  }
+});
+
+// Run after adding discount
+function addCustomerDiscount() {
+  document.getElementById("customerDiscountsContainer")
+    .insertAdjacentHTML("beforeend", createDiscountBlock("customer"));
+  updateDiscountVisibility(document);
+  runBXYEnforcement();
+}
+
+function addSupplierDiscount() {
+  document.getElementById("supplierDiscountsContainer").insertAdjacentHTML("beforeend", createDiscountBlock("supplier"));
+  updateDiscountVisibility(document);
+  runBXYEnforcement();
+}
+
+
+// 🔥 Fix: ensure dynamic inputs trigger update
+document.addEventListener("input", function(e) {
+  if (e.target.closest("#customerDiscountsContainer") || 
+      e.target.closest("#supplierDiscountsContainer")) {
+    updateGroupHeaders();
+update();
+  }
+});
+
+
+
+function removeDiscount(btn) {
+  btn.closest('.customer-discount, .supplier-discount').remove();
+  updateGroupHeaders();
+  update();
+  runBXYEnforcement();
+}
+
+function moveUp(btn) {
+  let el = btn.closest('.customer-discount, .supplier-discount');
+  let prev = el.previousElementSibling;
+  if (prev) el.parentNode.insertBefore(el, prev);
+  updateGroupHeaders();
+  update();
+  runBXYEnforcement();
+}
+
+function moveDown(btn) {
+  let el = btn.closest('.customer-discount, .supplier-discount');
+  let next = el.nextElementSibling;
+  if (next) el.parentNode.insertBefore(next, el);
+  updateGroupHeaders();
+  update();
+  runBXYEnforcement();
+}
+
+
+
+// 🔒 Enforce only ONE BXY per section
+
+
+function getDiscountOptions(includeBXY) {
+  return includeBXY
+    ? `
+      <option value="bxy">Buy X Get Y</option>
+      <option value="percent">% Discount</option>
+      <option value="fixed">Fixed Discount</option>
+    `
+    : `
+      <option value="percent">% Discount</option>
+      <option value="fixed">Fixed Discount</option>
+    `;
+}
+
+function enforceSingleBXY(containerId) {
+  let container = document.getElementById(containerId);
+  if (!container) return;
+
+  let blocks = container.querySelectorAll('.customer-discount, .supplier-discount');
+
+  // Check if ANY BXY exists
+  let bxyExists = Array.from(blocks).some(
+    b => b.querySelector('.type')?.value === 'bxy'
+  );
+
+  blocks.forEach(block => {
+    let select = block.querySelector('.type');
+    let currentValue = select.value;
+
+    // Decide whether this dropdown should include BXY
+    let shouldIncludeBXY = !bxyExists || currentValue === 'bxy';
+
+    // Rebuild options
+    select.innerHTML = getDiscountOptions(shouldIncludeBXY);
+
+    // Restore previous value if still valid
+    if (shouldIncludeBXY || currentValue !== 'bxy') {
+      select.value = currentValue;
+    } else {
+      select.value = 'percent';
+    }
+  });
+}
+
+// Hook into changes
+document.addEventListener("change", function(e) {
+  if (e.target.classList.contains("type")) {
+    enforceSingleBXY("customerDiscountsContainer");
+    enforceSingleBXY("supplierDiscountsContainer");
+  }
+});
+
+// Also run after adding/removing
+function runBXYEnforcement() {
+  enforceSingleBXY("customerDiscountsContainer");
+  enforceSingleBXY("supplierDiscountsContainer");
+}
+
+</script>
+
+</body>
+</html>

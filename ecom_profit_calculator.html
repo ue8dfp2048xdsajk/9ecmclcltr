@@ -641,7 +641,8 @@ update();
 function removeDiscount(btn) {
   btn.closest('.customer-discount, .supplier-discount').remove();
   updateGroupHeaders();
-update();
+  update();
+  runBXYEnforcement();
 }
 
 function moveUp(btn) {
@@ -649,7 +650,8 @@ function moveUp(btn) {
   let prev = el.previousElementSibling;
   if (prev) el.parentNode.insertBefore(el, prev);
   updateGroupHeaders();
-update();
+  update();
+  runBXYEnforcement();
 }
 
 function moveDown(btn) {
@@ -657,7 +659,8 @@ function moveDown(btn) {
   let next = el.nextElementSibling;
   if (next) el.parentNode.insertBefore(next, el);
   updateGroupHeaders();
-update();
+  update();
+  runBXYEnforcement();
 }
 
 // Add default discount blocks on load
@@ -671,25 +674,48 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 // 🔒 Enforce only ONE BXY per section
+
+
+function getDiscountOptions(includeBXY) {
+  return includeBXY
+    ? `
+      <option value="bxy">Buy X Get Y</option>
+      <option value="percent">% Discount</option>
+      <option value="fixed">Fixed Discount</option>
+    `
+    : `
+      <option value="percent">% Discount</option>
+      <option value="fixed">Fixed Discount</option>
+    `;
+}
+
 function enforceSingleBXY(containerId) {
   let container = document.getElementById(containerId);
   if (!container) return;
 
   let blocks = container.querySelectorAll('.customer-discount, .supplier-discount');
-  let bxyExists = Array.from(blocks).some(b => b.querySelector('.type').value === 'bxy');
+
+  // Check if ANY BXY exists
+  let bxyExists = Array.from(blocks).some(
+    b => b.querySelector('.type')?.value === 'bxy'
+  );
 
   blocks.forEach(block => {
     let select = block.querySelector('.type');
-    let current = select.value;
+    let currentValue = select.value;
 
-    Array.from(select.options).forEach(opt => {
-      if (opt.value === 'bxy' && !bxyExists) {
-        opt.disabled = false;
-      }
-      if (opt.value === 'bxy' && bxyExists && current !== 'bxy') {
-        opt.disabled = true;
-      }
-    });
+    // Decide whether this dropdown should include BXY
+    let shouldIncludeBXY = !bxyExists || currentValue === 'bxy';
+
+    // Rebuild options
+    select.innerHTML = getDiscountOptions(shouldIncludeBXY);
+
+    // Restore previous value if still valid
+    if (shouldIncludeBXY || currentValue !== 'bxy') {
+      select.value = currentValue;
+    } else {
+      select.value = 'percent';
+    }
   });
 }
 

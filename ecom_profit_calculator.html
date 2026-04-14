@@ -318,17 +318,14 @@ document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
       }
 
       if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
-        let groups = Math.floor(n / (d.bx + d.by));
-        let discountUnits = groups * d.by;
-        let unitCostApprox = costSingle;
+        let groupSize = d.bx + d.by;
+        let groups = Math.floor(n / groupSize);
+        let remainder = n % groupSize;
 
-        if (d.discountType === "free") {
-          productCost -= discountUnits * unitCostApprox;
-        } else if (d.discountType === "percent") {
-          productCost -= discountUnits * unitCostApprox * (d.value / 100);
-        } else if (d.discountType === "fixed") {
-          productCost -= discountUnits * d.value;
-        }
+        let payableUnits = (groups * d.bx) + Math.min(remainder, d.bx);
+
+        // FIX: recalculate cost based on payable units
+        productCost = calcBatchCost(payableUnits, costSingle, costBatch, batchSize);
       }
 
       if (d.type === "percent") {

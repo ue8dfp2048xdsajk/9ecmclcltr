@@ -297,7 +297,8 @@ function update() {
 
   let shipCustomerFirst = parseFloat(document.getElementById("shipCustomerFirst").value) || 0;
   let shipCustomerExtra = parseFloat(document.getElementById("shipCustomerExtra").value) || 0;
-  let freeShip = parseFloat(document.getElementById("freeShip").value) || 0;
+  let freeShipInput = document.getElementById("freeShip").value;
+  let freeShip = freeShipInput === "" ? Infinity : parseFloat(freeShipInput);
 
   let shipFirst = parseFloat(document.getElementById("shipFirst").value) || 0;
   let shipExtra = parseFloat(document.getElementById("shipExtra").value) || 0;

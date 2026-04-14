@@ -498,14 +498,32 @@ handleVisibility();
 updateGroupHeaders();
 update();
 
+
 function createDiscountBlock(type) {
+
+  // Check if BXY already exists in this section
+  let containerId = type === "customer" ? "customerDiscountsContainer" : "supplierDiscountsContainer";
+  let container = document.getElementById(containerId);
+
+  let bxyExists = false;
+  if (container) {
+    let blocks = container.querySelectorAll('.customer-discount, .supplier-discount');
+    bxyExists = Array.from(blocks).some(b => b.querySelector('.type')?.value === 'bxy');
+  }
+
+  // If BXY already exists → hide it from new dropdown
+  let options = bxyExists 
+    ? `<option value="percent">% Discount</option>
+       <option value="fixed">Fixed Discount</option>`
+    : `<option value="bxy">Buy X Get Y</option>
+       <option value="percent">% Discount</option>
+       <option value="fixed">Fixed Discount</option>`;
+
   return `
     <div class="${type}-discount">
       <label>Type</label>
       <select class="type">
-        <option value="bxy">Buy X Get Y</option>
-        <option value="percent">% Discount</option>
-        <option value="fixed">Fixed Discount</option>
+        ${options}
       </select>
 
       <div class="bxy-fields">
@@ -523,8 +541,6 @@ function createDiscountBlock(type) {
         <input class="value" placeholder="Value">
       </div>
 
-      
-
       <div style="display:flex; gap:6px; margin:6px 0;">
         <button onclick="moveUp(this)">↑</button>
         <button onclick="moveDown(this)">↓</button>
@@ -534,6 +550,7 @@ function createDiscountBlock(type) {
     </div>
   `;
 }
+
 
 
 // Handle dynamic discount visibility
@@ -566,9 +583,11 @@ function updateDiscountVisibility(container) {
 document.addEventListener("change", function(e) {
   if (e.target.classList.contains("bxyType")) {
     updateDiscountVisibility(document);
+  runBXYEnforcement();
   }
   if (e.target.classList.contains("type")) {
     updateDiscountVisibility(document);
+  runBXYEnforcement();
   }
 });
 
@@ -577,11 +596,13 @@ function addCustomerDiscount() {
   document.getElementById("customerDiscountsContainer")
     .insertAdjacentHTML("beforeend", createDiscountBlock("customer"));
   updateDiscountVisibility(document);
+  runBXYEnforcement();
 }
 
 function addSupplierDiscount() {
   document.getElementById("supplierDiscountsContainer").insertAdjacentHTML("beforeend", createDiscountBlock("supplier"));
   updateDiscountVisibility(document);
+  runBXYEnforcement();
 }
 
 
@@ -624,7 +645,46 @@ window.addEventListener("DOMContentLoaded", () => {
   addCustomerDiscount();
   addSupplierDiscount();
   updateDiscountVisibility(document);
+  runBXYEnforcement();
 });
+
+
+// 🔒 Enforce only ONE BXY per section
+function enforceSingleBXY(containerId) {
+  let container = document.getElementById(containerId);
+  if (!container) return;
+
+  let blocks = container.querySelectorAll('.customer-discount, .supplier-discount');
+  let bxyExists = Array.from(blocks).some(b => b.querySelector('.type').value === 'bxy');
+
+  blocks.forEach(block => {
+    let select = block.querySelector('.type');
+    let current = select.value;
+
+    Array.from(select.options).forEach(opt => {
+      if (opt.value === 'bxy' && !bxyExists) {
+        opt.disabled = false;
+      }
+      if (opt.value === 'bxy' && bxyExists && current !== 'bxy') {
+        opt.disabled = true;
+      }
+    });
+  });
+}
+
+// Hook into changes
+document.addEventListener("change", function(e) {
+  if (e.target.classList.contains("type")) {
+    enforceSingleBXY("customerDiscountsContainer");
+    enforceSingleBXY("supplierDiscountsContainer");
+  }
+});
+
+// Also run after adding/removing
+function runBXYEnforcement() {
+  enforceSingleBXY("customerDiscountsContainer");
+  enforceSingleBXY("supplierDiscountsContainer");
+}
 
 </script>
 

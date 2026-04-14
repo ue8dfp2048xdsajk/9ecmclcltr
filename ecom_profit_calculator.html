@@ -664,14 +664,6 @@ function moveDown(btn) {
   runBXYEnforcement();
 }
 
-// Add default discount blocks on load
-
-window.addEventListener("DOMContentLoaded", () => {
-  addCustomerDiscount();
-  addSupplierDiscount();
-  updateDiscountVisibility(document);
-  runBXYEnforcement();
-});
 
 
 // 🔒 Enforce only ONE BXY per section

@@ -102,6 +102,8 @@ td:not(:empty) { background: white; }
   <input id="shipFirst" value="" placeholder="e.g. 4.99">
   <label style="color:red;">Your shipping (additional)</label>
   <input id="shipExtra" value="" placeholder="e.g. 1.99">
+  <label>Items per parcel</label>
+  <input id="itemsPerParcel" placeholder="e.g. 4">
 
   <h3>Fees</h3>
   <label style="color:red;">Platform fee (%)</label>
@@ -385,7 +387,9 @@ document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
       if (!d.stackable) break;
     }
 
-    let shippingCost = shipFirst + (n - 1) * shipExtra;
+    let itemsPerParcel = parseInt(document.getElementById("itemsPerParcel")?.value) || 1;
+    let parcels = Math.ceil(n / itemsPerParcel);
+    let shippingCost = shipFirst + (parcels - 1) * shipExtra;
 
     
     // CUSTOMER DISCOUNTS
@@ -393,7 +397,7 @@ document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
     let chargedQty = n;
     let goodsRevenue = n * price;
 
-    let revenueBeforeDiscounts = (n * price) + (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+    let revenueBeforeDiscounts = (n * price) + (shipCustomerFirst + (parcels - 1) * shipCustomerExtra);
 
     // Build customer discounts array
     let customerDiscounts = [];
@@ -466,7 +470,7 @@ let qualifiesForFreeShipping = usePreDiscount
 
 let shippingRevenue = (freeShipEnabled && qualifiesForFreeShipping)
   ? 0
-  : (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+  : (shipCustomerFirst + (parcels - 1) * shipCustomerExtra);
     goodsRevenue = Math.max(0, goodsRevenue);
     
 let revenue = goodsRevenue + shippingRevenue;

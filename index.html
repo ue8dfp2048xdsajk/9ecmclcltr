@@ -712,11 +712,14 @@ function update() {
   let hasAnyRevenue = hasPrice || hasCustShip;
   let hasAnyCost = hasCost || hasYourShip || hasFulfilment;
 
-  let bestProfit = -Infinity;
-  let breakEvenCPA = 0;
-  let breakEvenROAS = 0;
   let selectedQtyVal = document.getElementById("selectedQty").value.trim();
   let selectedQty = selectedQtyVal !== "" ? parseInt(selectedQtyVal) : null;
+  let breakEvenCPA = 0;
+  let breakEvenROAS = null;
+
+  // First pass: compute all row data and find best profit
+  let rows = [];
+  let bestProfit = -Infinity;
 
   for (let n = 1; n <= 24; n++) {
     let productCost = calcBatchCost(n, costSingle, costBatch, batchSize);
@@ -733,13 +736,11 @@ function update() {
       });
     });
 
-    let nonStackSupp = false;
     for (let d of supplierDiscounts) {
       let meetsMinSupp = true;
       if (d.minType === "quantity") meetsMinSupp = n >= d.minValue;
       if (d.minType === "amount") meetsMinSupp = productCost >= d.minValue;
       if (!meetsMinSupp) continue;
-      if (!d.stackable) { nonStackSupp = true; }
       if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
         let groupSize = d.bx + d.by;
         let groups = Math.floor(n / groupSize);
@@ -756,7 +757,6 @@ function update() {
     let parcels = Math.ceil(n / itemsPerParcel);
     let shippingCost = shipFirst + (parcels - 1) * shipExtra;
 
-    let chargedQty = n;
     let goodsRevenue = n * price;
     let revenueBeforeDiscounts = (n * price) + (shipCustomerFirst + (parcels - 1) * shipCustomerExtra);
 
@@ -772,13 +772,11 @@ function update() {
       });
     });
 
-    let nonStackApplied = false;
     for (let d of customerDiscounts) {
       let meetsMin = true;
       if (d.minType === "quantity") meetsMin = n >= d.minValue;
       if (d.minType === "amount") meetsMin = goodsRevenue >= d.minValue;
       if (!meetsMin) continue;
-      if (!d.stackable) { nonStackApplied = true; }
       if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
         let groupSize = d.bx + d.by;
         let groups = Math.floor(n / groupSize);
@@ -836,12 +834,20 @@ function update() {
 
     if (selectedQty !== null && n === selectedQty) {
       breakEvenCPA = Math.max(0, profit);
-      breakEvenROAS = profit > 0 ? revenue / profit : null;
+      breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : null;
     }
 
+    rows.push({ n, goodsRevenue, shippingRevenue, revenueBeforeDiscounts, revenue, taxIncluded, taxValue, revenueWithTax, productCost, shippingCost, fulfilmentCost, totalCost, totalFees, profit, profitAfterAds, profitMargin });
+  }
+
+  // Second pass: render rows with correct highlight
+  let colCount = tbody.closest('table').querySelectorAll('thead tr:last-child th').length;
+  for (let i = 0; i < rows.length; i++) {
+    let { n, goodsRevenue, shippingRevenue, revenueBeforeDiscounts, revenue, taxIncluded, taxValue, revenueWithTax, productCost, shippingCost, fulfilmentCost, totalCost, totalFees, profit, profitAfterAds, profitMargin } = rows[i];
     let isSelected = selectedQty !== null && n === selectedQty;
     let extraClass = n > 1 ? 'extra-qty-row' : '';
-    let row = `<tr class="${extraClass} ${isSelected ? 'selectedRow' : ''}">
+    let highlightClass = profit === bestProfit ? 'highlight' : '';
+    let row = `<tr class="${extraClass} ${highlightClass} ${isSelected ? 'selectedRow' : ''}">
       <td>${n}</td>
       <td style="color:green; background:${hasPrice ? "#e6ffe6" : "#f7f7f7"} !important;">${display(goodsRevenue, hasPrice)}</td>
       <td style="color:green; background:${hasCustShip ? "#e6ffe6" : "#f7f7f7"} !important;">${display(shippingRevenue, hasCustShip)}</td>
@@ -860,7 +866,6 @@ function update() {
     tbody.innerHTML += row;
 
     if (n === 1) {
-      let colCount = tbody.closest('table').querySelectorAll('thead tr:last-child th').length;
       tbody.innerHTML += `<tr id="expandRow"><td colspan="${colCount}" style="padding:0; border:none; background:transparent;"><button id="expandBtn" onclick="toggleExtraRows()" style="width:100%; padding:8px 0; background:#f0f0f0; border:none; border-top:1px solid #ddd; border-bottom:1px dashed #ccc; cursor:pointer; font-size:12px; font-weight:600; color:#555; letter-spacing:0.3px;">&#9660; Show quantities 2–24</button></td></tr>`;
     }
   }

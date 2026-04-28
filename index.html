@@ -3,163 +3,215 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ecom Profit Calculator by Tia TX ©</title>
+<title>Ecom Profit Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
   background: #1a1a1a;
+  margin: 0;
+  padding: 40px 20px;
+  min-height: 100vh;
 }
 
-/* ── Header ── */
-header {
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+.header {
   background: linear-gradient(135deg, #00bfa5 0%, #00897b 100%);
   color: white;
-  padding: 18px 32px;
+  padding: 40px 40px 30px;
   position: relative;
   overflow: hidden;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-header::before {
+
+.header::before {
   content: '';
   position: absolute;
-  top: -60%;
-  right: -5%;
-  width: 320px;
-  height: 320px;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
   background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
   border-radius: 50%;
-  pointer-events: none;
 }
-header h1 {
-  margin: 0;
-  font-size: 24px;
+
+.header h1 {
+  margin: 0 0 8px 0;
+  font-size: 32px;
   font-weight: 700;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
   position: relative;
   z-index: 1;
 }
-header .subtitle {
-  font-size: 14px;
+
+.header .subtitle {
+  font-size: 16px;
   opacity: 0.9;
-  margin-top: 3px;
+  font-weight: 500;
   position: relative;
   z-index: 1;
-  font-weight: 500;
 }
 
-/* ── Main layout ── */
-.main {
+.layout {
   display: flex;
-  flex: 1;
-  overflow: hidden;
+  height: calc(100vh - 120px);
+  min-height: 600px;
 }
 
-/* ── Left Panel ── */
 .left {
-  width: 340px;
-  min-width: 260px;
-  flex-shrink: 0;
-  border-right: 2px solid #e5e7eb;
-  background: #fafafa;
+  width: 320px;
+  min-width: 280px;
+  padding: 28px 24px;
   overflow-y: auto;
-  padding: 16px 18px 48px 18px;
+  background: #fafafa;
+  border-right: 1px solid #e8e8e8;
+  flex-shrink: 0;
 }
 
-/* ── Right Panel ── */
 .right {
   flex: 1;
+  padding: 28px 32px;
+  overflow-x: auto;
   overflow-y: auto;
-  padding: 16px 20px 48px 20px;
-  background: white;
 }
 
-/* ── Section Titles ── */
-.section-title {
-  font-size: 11px;
+.left h2, .right h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.left h3 {
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #616161;
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 8px;
-  margin: 20px 0 12px 0;
+  color: #757575;
+  margin: 20px 0 10px 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e0e0e0;
 }
-.section-title:first-child { margin-top: 0; }
 
-/* ── Labels ── */
+.left h3:first-of-type {
+  margin-top: 0;
+}
+
 label {
   display: block;
   font-size: 12px;
   font-weight: 600;
-  margin-bottom: 3px;
+  color: #424242;
   margin-top: 10px;
-  color: #212121;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
-label.green { color: #2e7d32; }
-label.red   { color: #c62828; }
 
-/* ── Inputs & Selects ── */
-input, select {
+label[style*="color:green"], label[style*="color: green"] {
+  color: #00897b !important;
+}
+
+label[style*="color:red"], label[style*="color: red"] {
+  color: #e53935 !important;
+}
+
+input[type="text"],
+input[type="number"],
+input:not([type="checkbox"]):not([type="radio"]) {
   width: 100%;
   padding: 9px 12px;
+  margin-bottom: 4px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  margin-bottom: 8px;
+  font-family: inherit;
   background: #f5f5f5;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  display: block;
   color: #212121;
+  transition: all 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
 }
-input:not(:placeholder-shown) { background: white; }
-input:focus, select:focus {
+
+input:not([type="checkbox"]):not([type="radio"]):not(:placeholder-shown) {
+  background: white;
+  border-color: #b2dfdb;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus {
   outline: none;
   border-color: #00bfa5;
-  box-shadow: 0 0 0 3px rgba(0,191,165,0.12);
   background: white;
+  box-shadow: 0 0 0 3px rgba(0,191,165,0.1);
 }
-input[type="checkbox"], input[type="radio"] {
-  width: 15px;
-  height: 15px;
-  display: inline-block;
-  margin: 0 6px 0 0;
-  accent-color: #00bfa5;
-  cursor: pointer;
-}
-select { background: white; cursor: pointer; }
 
-/* ── Checkbox label rows ── */
-.check-label {
+input::placeholder {
+  color: #bdbdbd;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  margin-right: 6px;
+  accent-color: #00bfa5;
+}
+
+label:has(input[type="checkbox"]),
+label:has(input[type="radio"]) {
   display: flex;
   align-items: center;
   font-size: 13px;
   font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
   color: #424242;
-  margin-bottom: 8px;
-  margin-top: 4px;
   cursor: pointer;
+  margin-top: 8px;
 }
 
-/* ── Input pair ── */
-.input-pair { display: flex; gap: 10px; }
-.input-pair > div { flex: 1; }
+select {
+  width: 100%;
+  padding: 9px 12px;
+  margin-bottom: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  color: #212121;
+  display: block;
+  cursor: pointer;
+  transition: all 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23757575' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
 
-/* ── Buttons ── */
-button {
-  padding: 8px 14px;
+select:focus {
+  outline: none;
+  border-color: #00bfa5;
+  box-shadow: 0 0 0 3px rgba(0,191,165,0.1);
+}
+
+button:not(.tooltip-btn) {
+  padding: 9px 16px;
   cursor: pointer;
   background: linear-gradient(135deg, #00bfa5 0%, #00897b 100%);
   color: white;
@@ -167,290 +219,369 @@ button {
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
-  font-family: 'Inter', sans-serif;
+  font-family: inherit;
   transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0,191,165,0.25);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-  box-shadow: 0 2px 4px rgba(0,191,165,0.2);
+  letter-spacing: 0.4px;
+  margin-top: 8px;
+  margin-bottom: 4px;
 }
-button:hover {
+
+button:not(.tooltip-btn):hover {
   background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
-  box-shadow: 0 4px 8px rgba(0,191,165,0.3);
+  box-shadow: 0 4px 10px rgba(0,191,165,0.35);
   transform: translateY(-1px);
 }
-button:active { transform: translateY(0); }
-.btn-full { width: 100%; margin-bottom: 4px; }
-.btn-neutral {
-  background: linear-gradient(135deg, #757575 0%, #616161 100%);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+
+button:not(.tooltip-btn):active {
+  transform: translateY(0);
 }
-.btn-neutral:hover {
-  background: linear-gradient(135deg, #616161 0%, #424242 100%);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+
+.customer-discount button,
+.supplier-discount button {
+  padding: 6px 10px;
+  font-size: 11px;
+  margin-top: 0;
 }
-.btn-danger {
+
+.customer-discount button[style*="color:red"],
+.supplier-discount button[style*="color:red"],
+.customer-discount button[style*="color: red"],
+.supplier-discount button[style*="color: red"] {
   background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-  box-shadow: 0 2px 4px rgba(244,67,54,0.2);
-}
-.btn-danger:hover {
-  background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
-  box-shadow: 0 4px 8px rgba(244,67,54,0.3);
+  box-shadow: 0 2px 6px rgba(244,67,54,0.25);
 }
 
-/* ── Results header ── */
-.results-title {
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: #616161;
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 8px;
-  margin-bottom: 16px;
-}
-
-/* ── Metrics Cards ── */
-.metrics { display: flex; gap: 16px; margin-bottom: 20px; }
-.card {
-  background: #f8f9fa;
-  border: 2px solid #e5e7eb;
+.customer-discount,
+.supplier-discount {
+  background: white;
+  border: 1px solid #e0e0e0;
   border-radius: 10px;
-  padding: 14px 16px;
-  flex: 1;
-  text-align: center;
+  padding: 14px;
+  margin-bottom: 10px;
 }
-.card-label {
+
+.customer-discount hr,
+.supplier-discount hr {
+  display: none;
+}
+
+.discount-type-label {
+  color: #424242 !important;
   font-size: 12px;
   font-weight: 600;
-  color: #616161;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-  line-height: 1.4;
-}
-.card-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: #212121;
+  letter-spacing: 0.4px;
+  margin-top: 0;
 }
 
-/* ── Table wrapper ── */
-.table-wrapper {
-  overflow-x: auto;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+.customer-discount .discount-type-label { color: #e53935 !important; }
+.supplier-discount .discount-type-label { color: #00897b !important; }
+
+.customer-discount input,
+.supplier-discount input {
+  margin-bottom: 6px;
 }
+
+#freeShipContainer {
+  background: #f0faf9;
+  border-left: 3px solid #00bfa5;
+  border-radius: 0 8px 8px 0;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+#batchContainer {
+  background: #f0faf9;
+  border-left: 3px solid #00bfa5;
+  border-radius: 0 8px 8px 0;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: linear-gradient(135deg, #e0f2f1 0%, #f1f8f7 100%);
+  border: 1px solid #b2dfdb;
+  padding: 18px 20px;
+  border-radius: 12px;
+  flex: 1;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,191,165,0.08);
+}
+
+.card > div:first-child {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #546e7a;
+  margin-bottom: 8px;
+}
+
+.card > div:last-child {
+  font-size: 26px;
+  font-weight: 700;
+  color: #00695c;
+}
+
+/* Table — no background overrides on td so JS inline styles work unchanged */
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
-  font-family: 'Inter', sans-serif;
-  display: table;
-  margin-bottom: 0;
-}
-th, td {
+  margin-top: 0;
+  font-size: 13px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   border: 1px solid #e0e0e0;
-  padding: 7px 10px;
-  text-align: center;
-  white-space: nowrap;
 }
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: center;
+}
+
 th {
-  background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+  background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
   font-weight: 700;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  position: sticky;
-  z-index: 2;
   color: #424242;
-  border-bottom: 2px solid #d0d0d0;
+  border-bottom: 2px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  overflow: visible;
 }
-thead tr:first-child th { top: 0; }
-thead tr:nth-child(2) th { top: 33px; }
-tbody td { background: #f9f9f9; }
-tbody td:not(:empty) { background: white; }
-tbody tr.highlight td:not(:empty) { background: #e6ffe6; }
-tbody tr.selectedRow td { outline: 2px solid #00bfa5; outline-offset: -2px; }
-tbody tr:hover td { filter: brightness(0.96); }
 
-/* ── Discount blocks ── */
-.customer-discount, .supplier-discount {
-  background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
+th:has(.tooltip:hover) {
+  z-index: 10000;
 }
-.discount-type-label {
-  font-size: 11px;
+
+thead tr:first-child th {
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.3px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-  display: block;
-  color: #212121;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 12px 10px;
 }
-.customer-discount .discount-type-label { color: #c62828; }
-.supplier-discount .discount-type-label { color: #2e7d32; }
-.discount-btn-row { display: flex; gap: 6px; margin-top: 8px; }
 
-/* ── Tooltip ── */
-.tooltip { position: relative; display: inline-block; cursor: help; }
+tbody tr {
+  transition: background 0.15s;
+}
+
+/* Match original: empty cells grey, non-empty white */
+td {
+  background: #f7f7f7;
+}
+
+td:not(:empty) {
+  background: white;
+}
+
+/* Quantity column always grey */
+tbody td:first-child {
+  background: #f7f7f7 !important;
+}
+
+.highlight {
+  background: #e6ffe6;
+}
+
+.highlight td:not(:empty) {
+  background: #e6ffe6;
+}
+
+.highlight td:first-child {
+  background: #f7f7f7 !important;
+}
+
+.selectedRow td {
+  box-shadow: inset 0 2px 0 #666, inset 0 -2px 0 #666;
+}
+
+.selectedRow td:first-child {
+  box-shadow: inset 0 2px 0 #666, inset 0 -2px 0 #666, inset 2px 0 0 #666;
+}
+
+.selectedRow td:last-child {
+  box-shadow: inset 0 2px 0 #666, inset 0 -2px 0 #666, inset -2px 0 0 #666;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 260px;
-  background-color: #333;
+  background-color: #212121;
   color: #fff;
   text-align: left;
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
   position: absolute;
-  z-index: 100;
+  z-index: 9999;
   bottom: 125%;
   left: 50%;
   transform: translateX(-50%);
   opacity: 0;
   transition: opacity 0.2s;
-  font-size: 11px;
-  line-height: 1.5;
-  pointer-events: none;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
-.tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #b2dfdb; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #00bfa5; }
+
+@media (max-width: 960px) {
+  .layout { flex-direction: column; height: auto; }
+  .left { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid #e8e8e8; }
+  .right { padding: 20px 16px; }
+  .metrics { flex-direction: column; }
+  .header { padding: 24px 20px 20px; }
+  .header h1 { font-size: 24px; }
+}
 </style>
 </head>
 <body>
 
-<!-- ── Header ── -->
-<header>
-  <h1>Ecom Profit Calculator</h1>
-  <div class="subtitle">by Tia TX ©</div>
-</header>
+<div class="container">
+  <div class="header">
+    <h1>Ecom Profit Calculator by Tia TX ©</h1>
+    <div class="subtitle">Analyze margins and costs across order quantities to check profit before selling a product.</div>
+  </div>
 
-<!-- ── Main Layout ── -->
-<div class="main">
+  <div class="layout">
+    <div class="left">
+      <h2>Inputs</h2>
 
-  <!-- ── LEFT PANEL ── -->
-  <div class="left">
+      <h3>Product</h3>
+      <label style="color:green;">Price per unit</label>
+      <input id="price" value="" placeholder="e.g. 25.99">
+      <label style="color:red;">Single unit cost</label>
+      <input id="costSingle" value="" placeholder="e.g. 7.99">
 
-    <div class="section-title">Product</div>
-    <label class="green">Price per unit</label>
-    <input id="price" placeholder="e.g. 25.99">
-    <label class="red">Single unit cost</label>
-    <input id="costSingle" placeholder="e.g. 7.99">
+      <h3>Shipping</h3>
+      <label style="color:green;">Customer shipping price (first item)</label>
+      <input id="shipCustomerFirst" value="" placeholder="e.g. 4.99">
+      <label style="color:green;">Customer shipping price (additional items)</label>
+      <input id="shipCustomerExtra" value="" placeholder="e.g. 1.99">
+      <label><input type="checkbox" id="freeShipToggle"> Enable Free Shipping</label>
+      <div id="freeShipContainer" style="display:none;">
+        <label>Free Shipping Threshold Amount</label>
+        <input id="freeShip" value="" placeholder="e.g. 35">
+        <label>
+          <input type="radio" name="freeShipMode" id="freeShipAfterDiscounts" checked>
+          Apply after item discounts (Shopify default)
+        </label>
+        <label>
+          <input type="radio" name="freeShipMode" id="freeShipBeforeDiscounts">
+          Apply before discounts (original cart value)
+        </label>
+      </div>
+      <label style="color:red;">Your shipping (first item)</label>
+      <input id="shipFirst" value="" placeholder="e.g. 4.99">
+      <label style="color:red;">Your shipping (additional)</label>
+      <input id="shipExtra" value="" placeholder="e.g. 1.99">
+      <label>Items per parcel</label>
+      <input id="itemsPerParcel" placeholder="e.g. 4">
 
-    <div class="section-title">Shipping</div>
-    <label class="green">Customer shipping price (first item)</label>
-    <input id="shipCustomerFirst" placeholder="e.g. 4.99">
-    <label class="green">Customer shipping price (additional items)</label>
-    <input id="shipCustomerExtra" placeholder="e.g. 1.99">
+      <h3>Fees</h3>
+      <label style="color:red;">Platform fee (%)</label>
+      <input id="platformFeePercent" placeholder="e.g. 6.5">
+      <label style="color:red;">Fixed fee per order</label>
+      <input id="fixedFee" placeholder="e.g. 0.20">
+      <label style="color:red;">Payment processor fee (%)</label>
+      <input id="processorFeePercent" placeholder="e.g. 2.9">
+      <label style="color:red;">Fulfilment &amp; storage cost per unit</label>
+      <input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
 
-    <label class="check-label">
-      <input type="checkbox" id="freeShipToggle"> Enable Free Shipping
-    </label>
+      <h3>Tax</h3>
+      <label>Tax rate (%)</label>
+      <input id="taxRate" value="" placeholder="e.g. 20">
+      <label style="color:red;"><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
+      <label><input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax</label>
 
-    <div id="freeShipContainer" style="display:none; padding-left:4px;">
-      <label>Free Shipping Threshold Amount</label>
-      <input id="freeShip" placeholder="e.g. 35">
-      <label class="check-label">
-        <input type="radio" name="freeShipMode" id="freeShipAfterDiscounts" checked>
-        Apply after item discounts (Shopify default)
-      </label>
-      <label class="check-label">
-        <input type="radio" name="freeShipMode" id="freeShipBeforeDiscounts">
-        Apply before discounts (original cart value)
-      </label>
+      <h3>Ads</h3>
+      <label>Estimated CPA</label>
+      <input id="cpa" value="" placeholder="e.g. 20">
+      <label>Estimated Quantity Bought</label>
+      <input id="selectedQty" type="number" min="1" max="24" value="" placeholder="e.g. 6">
+      <label><input type="checkbox" id="marginWithAdsToggle"> Show Profit Margin With Ads</label>
+
+      <h3>Customer Discounts</h3>
+      <div id="customerDiscountsContainer"></div>
+      <button onclick="addCustomerDiscount()">+ Add Customer Discount</button>
+
+      <h3>Supplier Discounts</h3>
+      <div id="supplierDiscountsContainer"></div>
+
+      <label><input type="checkbox" id="enableBatch"> Enable Batch Pricing</label>
+      <div id="batchContainer" style="display:none;">
+        <div style="display:flex; gap:10px;">
+          <div style="flex:1;">
+            <label>Batch cost</label>
+            <input id="costBatch" value="" placeholder="e.g. 4.32">
+          </div>
+          <div style="flex:1;">
+            <label>Batch size</label>
+            <input id="batchSize" value="" placeholder="e.g. 4">
+          </div>
+        </div>
+        <label>Pricing Model</label>
+        <select id="pricingModel">
+          <option value="unit">Per Unit Pricing</option>
+          <option value="batch">Batch Production</option>
+        </select>
+      </div>
+
+      <button onclick="addSupplierDiscount()">+ Add Supplier Discount</button>
     </div>
 
-    <label class="red">Your shipping (first item)</label>
-    <input id="shipFirst" placeholder="e.g. 4.99">
-    <label class="red">Your shipping (additional)</label>
-    <input id="shipExtra" placeholder="e.g. 1.99">
+    <div class="right">
+      <h2>Results</h2>
 
-    <div class="section-title">Fees</div>
-    <label class="red">Platform fee (%)</label>
-    <input id="platformFeePercent" placeholder="e.g. 6.5">
-    <label class="red">Fixed fee per order</label>
-    <input id="fixedFee" placeholder="e.g. 0.20">
-    <label class="red">Payment processor fee (%)</label>
-    <input id="processorFeePercent" placeholder="e.g. 2.9">
-    <label class="red">Fulfilment &amp; storage cost per unit</label>
-    <input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
-
-    <div class="section-title">Tax</div>
-    <label>Tax rate (%)</label>
-    <input id="taxRate" placeholder="e.g. 20">
-    <label class="check-label" style="color:#c62828;">
-      <input type="checkbox" id="taxIncluded"> Tax already included in price
-    </label>
-    <label class="check-label">
-      <input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax
-    </label>
-
-    <div class="section-title">Ads</div>
-    <label>Estimated CPA</label>
-    <input id="cpa" placeholder="e.g. 20">
-    <label>Estimated Quantity Bought</label>
-    <input id="selectedQty" type="number" min="1" max="24" placeholder="e.g. 6">
-    <label class="check-label">
-      <input type="checkbox" id="marginWithAdsToggle"> Show Profit Margin With Ads
-    </label>
-
-    <div class="section-title">Customer Discounts</div>
-    <div id="customerDiscountsContainer"></div>
-    <button class="btn-full" onclick="addCustomerDiscount()">+ Add Customer Discount</button>
-
-    <div class="section-title">Supplier Discounts</div>
-    <div id="supplierDiscountsContainer"></div>
-
-    <label class="check-label">
-      <input type="checkbox" id="enableBatch"> Enable Batch Pricing
-    </label>
-
-    <div id="batchContainer" style="display:none; padding-left:4px;">
-      <div class="input-pair">
-        <div>
-          <label>Batch cost</label>
-          <input id="costBatch" placeholder="e.g. 4.32">
+      <div class="metrics">
+        <div class="card">
+          <div>Max CPA (Break-even) At Selected Quantity</div>
+          <div id="breakEven">-</div>
         </div>
-        <div>
-          <label>Batch size</label>
-          <input id="batchSize" placeholder="e.g. 4">
+        <div class="card">
+          <div>
+            ROAS Required to Break Even At Selected Quantity
+            <span class="tooltip">ⓘ
+              <span class="tooltiptext">
+                Breakeven ROAS = 1 / (profit margin before ads)
+              </span>
+            </span>
+          </div>
+          <div id="breakEvenROAS">-</div>
         </div>
       </div>
-      <label>Pricing Model</label>
-      <select id="pricingModel">
-        <option value="unit">Per Unit Pricing</option>
-        <option value="batch">Batch Production</option>
-      </select>
-    </div>
 
-    <button class="btn-full" style="margin-top:8px;" onclick="addSupplierDiscount()">+ Add Supplier Discount</button>
-
-  </div><!-- /left -->
-
-  <!-- ── RIGHT PANEL ── -->
-  <div class="right">
-
-    <div class="results-title">Results</div>
-
-    <div class="metrics">
-      <div class="card">
-        <div class="card-label">Max CPA (Break-even) At Selected Quantity</div>
-        <div class="card-value" id="breakEven">-</div>
-      </div>
-      <div class="card">
-        <div class="card-label">
-          ROAS Required to Break Even At Selected Quantity
-          <span class="tooltip">ⓘ
-            <span class="tooltiptext">Breakeven ROAS = 1 / (profit margin before ads)</span>
-          </span>
-        </div>
-        <div class="card-value" id="breakEvenROAS">-</div>
-      </div>
-    </div>
-
-    <div class="table-wrapper">
       <table id="table">
         <thead>
           <tr>
@@ -460,39 +591,39 @@ tbody tr:hover td { filter: brightness(0.96); }
             <th id="profitGroup" colspan="3" style="background:#fff3cd; color:#b8860b;">Profit / Loss</th>
           </tr>
           <tr>
-            <th style="color:#212121;">Quantity</th>
+            <th style="color:black;">Quantity</th>
             <th style="color:green; font-weight:normal;">Item Revenue</th>
             <th style="color:green; font-weight:normal;">Shipping Revenue</th>
-            <th style="color:gray; font-weight:normal;">
+            <th style="color:green; font-weight:normal;">
               <span style="color:gray;">Total Revenue Before Discounts</span>
               <span class="tooltip" style="color:gray;">ⓘ
-                <span class="tooltiptext">This shows revenue before any item or shipping discounts are applied.</span>
+                <span class="tooltiptext">
+                  This shows revenue before any item or shipping discounts are applied.
+                </span>
               </span>
             </th>
             <th style="color:green;">Total Revenue</th>
-            <th id="taxHeader" style="color:gray; font-weight:normal;">Revenue with Tax</th>
+            <th id="taxHeader" style="color:purple; font-weight:normal;">Revenue with Tax</th>
             <th style="color:red; font-weight:normal;">Item Cost</th>
             <th style="color:red; font-weight:normal;">Shipping Cost</th>
             <th style="color:red; font-weight:normal;">Fulfilment &amp; Storage Fees</th>
             <th style="color:red;">Total Cost (COGS)</th>
             <th style="color:red; font-weight:normal;">Platform Fees</th>
-            <th style="color:#212121;">Profit</th>
-            <th style="color:#212121;">Profit After Ads At CPA</th>
-            <th id="profitMarginHeader" style="color:#212121;">Profit Margin Before Ads</th>
+            <th style="color:black;">Profit</th>
+            <th style="color:black;">Profit After Ads At CPA</th>
+            <th id="profitMarginHeader" style="color:black;">Profit Margin Before Ads</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-
-  </div><!-- /right -->
-
-</div><!-- /main -->
+  </div>
+</div>
 
 <script>
 function calcBatchCost(n, costSingle, costBatch, batchSize) {
   let batchEnabled = document.getElementById("enableBatch")?.checked;
-  if (!batchEnabled) return n * costSingle;
+  if (!batchEnabled) { return n * costSingle; }
   let model = document.getElementById("pricingModel").value;
   if (model === "unit") {
     if (n < batchSize) return n * costSingle;
@@ -534,6 +665,17 @@ function updateGroupHeaders() {
   }
 }
 
+let tableExpanded = false;
+
+function toggleExtraRows() {
+  tableExpanded = !tableExpanded;
+  document.querySelectorAll('.extra-qty-row').forEach(r => {
+    r.style.display = tableExpanded ? '' : 'none';
+  });
+  let btn = document.getElementById('expandBtn');
+  if (btn) btn.textContent = tableExpanded ? '▲ Hide quantities 2–24' : '▼ Show quantities 2–24';
+}
+
 function update() {
   let marginToggle = document.getElementById("marginWithAdsToggle");
   let header = document.getElementById("profitMarginHeader");
@@ -555,7 +697,6 @@ function update() {
 
   let tbody = document.querySelector("#table tbody");
   tbody.innerHTML = "";
-
   let taxIncluded = document.getElementById("taxIncluded").checked;
   document.getElementById("taxHeader").innerText = taxIncluded ? "Tax Payable" : "Revenue with Tax";
   document.getElementById("taxHeader").style.color = taxIncluded ? "red" : "gray";
@@ -574,6 +715,8 @@ function update() {
   let bestProfit = -Infinity;
   let breakEvenCPA = 0;
   let breakEvenROAS = 0;
+  let selectedQtyVal = document.getElementById("selectedQty").value.trim();
+  let selectedQty = selectedQtyVal !== "" ? parseInt(selectedQtyVal) : null;
 
   for (let n = 1; n <= 24; n++) {
     let productCost = calcBatchCost(n, costSingle, costBatch, batchSize);
@@ -590,11 +733,13 @@ function update() {
       });
     });
 
+    let nonStackSupp = false;
     for (let d of supplierDiscounts) {
       let meetsMinSupp = true;
       if (d.minType === "quantity") meetsMinSupp = n >= d.minValue;
       if (d.minType === "amount") meetsMinSupp = productCost >= d.minValue;
       if (!meetsMinSupp) continue;
+      if (!d.stackable) { nonStackSupp = true; }
       if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
         let groupSize = d.bx + d.by;
         let groups = Math.floor(n / groupSize);
@@ -602,14 +747,18 @@ function update() {
         let payableUnits = (groups * d.bx) + Math.min(remainder, d.bx);
         productCost = calcBatchCost(payableUnits, costSingle, costBatch, batchSize);
       }
-      if (d.type === "percent") productCost *= (1 - d.value / 100);
-      else if (d.type === "fixed") productCost = Math.max(0, productCost - d.value);
+      if (d.type === "percent") { productCost *= (1 - d.value / 100); }
+      else if (d.type === "fixed") { productCost = Math.max(0, productCost - d.value); }
       if (!d.stackable) break;
     }
 
-    let shippingCost = shipFirst + (n - 1) * shipExtra;
+    let itemsPerParcel = parseInt(document.getElementById("itemsPerParcel")?.value) || 1;
+    let parcels = Math.ceil(n / itemsPerParcel);
+    let shippingCost = shipFirst + (parcels - 1) * shipExtra;
+
+    let chargedQty = n;
     let goodsRevenue = n * price;
-    let revenueBeforeDiscounts = (n * price) + (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+    let revenueBeforeDiscounts = (n * price) + (shipCustomerFirst + (parcels - 1) * shipCustomerExtra);
 
     let customerDiscounts = [];
     document.querySelectorAll("#customerDiscountsContainer .customer-discount").forEach(el => {
@@ -623,22 +772,24 @@ function update() {
       });
     });
 
+    let nonStackApplied = false;
     for (let d of customerDiscounts) {
       let meetsMin = true;
       if (d.minType === "quantity") meetsMin = n >= d.minValue;
       if (d.minType === "amount") meetsMin = goodsRevenue >= d.minValue;
       if (!meetsMin) continue;
+      if (!d.stackable) { nonStackApplied = true; }
       if (d.type === "bxy" && d.bx > 0 && d.by > 0) {
         let groupSize = d.bx + d.by;
         let groups = Math.floor(n / groupSize);
         let remainder = n % groupSize;
         let payableUnits = (groups * d.bx) + Math.min(remainder, d.bx);
-        if (d.discountType === "free") goodsRevenue = payableUnits * price;
-        else if (d.discountType === "percent") goodsRevenue -= (n - payableUnits) * price * (d.value / 100);
-        else if (d.discountType === "fixed") goodsRevenue -= (n - payableUnits) * d.value;
+        if (d.discountType === "free") { goodsRevenue = payableUnits * price; }
+        else if (d.discountType === "percent") { let du = n - payableUnits; goodsRevenue -= du * price * (d.value / 100); }
+        else if (d.discountType === "fixed") { let du = n - payableUnits; goodsRevenue -= du * d.value; }
       }
-      if (d.type === "percent") goodsRevenue *= (1 - d.value / 100);
-      else if (d.type === "fixed") goodsRevenue = Math.max(0, goodsRevenue - d.value);
+      if (d.type === "percent") { goodsRevenue *= (1 - d.value / 100); }
+      else if (d.type === "fixed") { goodsRevenue = Math.max(0, goodsRevenue - d.value); }
       if (!d.stackable) break;
     }
 
@@ -646,75 +797,97 @@ function update() {
     let usePreDiscount = document.getElementById("freeShipBeforeDiscounts")?.checked;
     let preDiscountItemsRevenue = n * price;
     let qualifiesForFreeShipping = usePreDiscount ? preDiscountItemsRevenue >= freeShip : goodsRevenue >= freeShip;
-    let shippingRevenue = (freeShipEnabled && qualifiesForFreeShipping) ? 0 : (shipCustomerFirst + (n - 1) * shipCustomerExtra);
+    let shippingRevenue = (freeShipEnabled && qualifiesForFreeShipping)
+      ? 0
+      : (shipCustomerFirst + (parcels - 1) * shipCustomerExtra);
     goodsRevenue = Math.max(0, goodsRevenue);
+
     let revenue = goodsRevenue + shippingRevenue;
 
     let taxPercent = parseFloat(document.getElementById("taxRate").value) || 0;
     let taxRate = taxPercent / 100;
     let taxFraction = taxPercent / (100 + taxPercent);
+    let taxIncluded = document.getElementById("taxIncluded").checked;
     let includeShippingInTax = document.getElementById("includeShippingInTax").checked;
     let taxBase = includeShippingInTax ? revenue : goodsRevenue;
     let taxValue = taxIncluded ? taxBase * taxFraction : taxBase * taxRate;
-    let revenueWithTax = taxIncluded ? revenue : (includeShippingInTax ? revenue * (1 + taxRate) : (goodsRevenue * (1 + taxRate) + shippingRevenue));
+    let revenueWithTax = taxIncluded
+      ? revenue
+      : (includeShippingInTax ? revenue * (1 + taxRate) : (goodsRevenue * (1 + taxRate) + shippingRevenue));
 
     let platformPercent = parseFloat(document.getElementById("platformFeePercent").value) || 0;
     let processorPercent = parseFloat(document.getElementById("processorFeePercent").value) || 0;
     let fixedFee = parseFloat(document.getElementById("fixedFee").value) || 0;
     let percentFees = revenue * (platformPercent / 100) + revenue * (processorPercent / 100);
     let totalFees = percentFees + fixedFee;
+
     let fulfilmentPerUnit = parseFloat(document.getElementById("fulfilmentPerUnit").value) || 0;
     let fulfilmentCost = n * fulfilmentPerUnit;
 
     productCost = Math.max(0, productCost);
     let totalCost = productCost + shippingCost + fulfilmentCost;
     let profit = revenue - totalCost - totalFees;
-    if (taxIncluded) profit -= taxValue;
-
+    if (taxIncluded) { profit -= taxValue; }
     let profitAfterAds = profit - cpa;
     let marginWithAds = document.getElementById("marginWithAdsToggle").checked;
     let profitMargin = revenue > 0 ? ((marginWithAds ? profitAfterAds : profit) / revenue) * 100 : 0;
 
     if (profit > bestProfit) bestProfit = profit;
-    let selectedQty = parseInt(document.getElementById("selectedQty").value) || 1;
-    if (n === selectedQty) {
+
+    if (selectedQty !== null && n === selectedQty) {
       breakEvenCPA = Math.max(0, profit);
-      breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : null;
+      breakEvenROAS = profit > 0 ? revenue / profit : null;
     }
 
-    let taxRateValue = document.getElementById("taxRate").value;
-    let selectedQtyValue = document.getElementById("selectedQty").value;
-    let cpaValue = document.getElementById("cpa").value;
-
-    let row = `<tr class="${profit === bestProfit ? 'highlight' : ''} ${selectedQtyValue ? (n === selectedQty ? 'selectedRow' : '') : ''}">
+    let isSelected = selectedQty !== null && n === selectedQty;
+    let extraClass = n > 1 ? 'extra-qty-row' : '';
+    let row = `<tr class="${extraClass} ${isSelected ? 'selectedRow' : ''}">
       <td>${n}</td>
-      <td style="color:green; background:${hasPrice ? "white" : "#f7f7f7"} !important;">${display(goodsRevenue, hasPrice)}</td>
-      <td style="color:green;">${display(shippingRevenue, hasCustShip)}</td>
+      <td style="color:green; background:${hasPrice ? "#e6ffe6" : "#f7f7f7"} !important;">${display(goodsRevenue, hasPrice)}</td>
+      <td style="color:green; background:${hasCustShip ? "#e6ffe6" : "#f7f7f7"} !important;">${display(shippingRevenue, hasCustShip)}</td>
       <td style="color:gray; background:#f2f2f2;">${display(revenueBeforeDiscounts, hasAnyRevenue)}</td>
-      <td style="color:green; font-weight:bold;">${display(revenue, hasAnyRevenue)}</td>
-      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${taxRateValue === "" ? "#f7f7f7" : (taxIncluded ? "white" : "#f2f2f2")}; font-weight:normal;">${taxRateValue === "" ? "" : display(taxIncluded ? taxValue : revenueWithTax, hasAnyRevenue)}</td>
-      <td style="color:red;">${display(productCost, hasCost)}</td>
-      <td style="color:red;">${display(shippingCost, hasYourShip)}</td>
-      <td style="color:red;">${display(fulfilmentCost, hasFulfilment)}</td>
-      <td style="color:red; font-weight:bold;">${display(totalCost, hasAnyCost)}</td>
-      <td style="color:red;">${display(totalFees, hasFees)}</td>
+      <td style="color:green; font-weight:bold; background:${hasAnyRevenue ? "#e6ffe6" : "#f7f7f7"} !important;">${display(revenue, hasAnyRevenue)}</td>
+      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${document.getElementById("taxRate").value === "" ? "#f7f7f7" : (taxIncluded ? "white" : "#f2f2f2")}; font-weight:normal;">${document.getElementById("taxRate").value === "" ? "" : display(taxIncluded ? taxValue : revenueWithTax, hasAnyRevenue)}</td>
+      <td style="color:red; background:${hasCost ? "#ffe6e6" : "#f7f7f7"} !important;">${display(productCost, hasCost)}</td>
+      <td style="color:red; background:${hasYourShip ? "#ffe6e6" : "#f7f7f7"} !important;">${display(shippingCost, hasYourShip)}</td>
+      <td style="color:red; background:${hasFulfilment ? "#ffe6e6" : "#f7f7f7"} !important;">${display(fulfilmentCost, hasFulfilment)}</td>
+      <td style="color:red; font-weight:bold; background:${hasAnyCost ? "#ffe6e6" : "#f7f7f7"} !important;">${display(totalCost, hasAnyCost)}</td>
+      <td style="color:red; background:${hasFees ? "#ffe6e6" : "#f7f7f7"} !important;">${display(totalFees, hasFees)}</td>
       ${(hasAnyRevenue || hasAnyCost) ? `<td style="color:${profit >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profit >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profit, true)}</td>` : `<td>${display(profit, false)}</td>`}
-      ${(hasAnyRevenue || hasAnyCost) ? (cpaValue === "" ? `<td></td>` : `<td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profitAfterAds, true)}</td>`) : `<td></td>`}
-      ${hasAnyRevenue ? `<td style="color:${profitMargin >= 0 ? 'green' : 'red'}; font-weight:bold;">${profitMargin.toFixed(2)}%</td>` : `<td></td>`}
+      ${(hasAnyRevenue || hasAnyCost) ? (document.getElementById("cpa").value === "" ? `<td></td>` : `<td style="color:${profitAfterAds >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitAfterAds >= 0 ? '#e6ffe6' : '#ffe6e6'};">${display(profitAfterAds, true)}</td>`) : `<td></td>`}
+      ${hasAnyRevenue ? `<td style="color:${profitMargin >= 0 ? 'green' : 'red'}; font-weight:bold; background:${profitMargin >= 0 ? '#e6ffe6' : '#ffe6e6'};">${profitMargin.toFixed(2)}%</td>` : `<td></td>`}
     </tr>`;
-
     tbody.innerHTML += row;
+
+    if (n === 1) {
+      let colCount = tbody.closest('table').querySelectorAll('thead tr:last-child th').length;
+      tbody.innerHTML += `<tr id="expandRow"><td colspan="${colCount}" style="padding:0; border:none; background:transparent;"><button id="expandBtn" onclick="toggleExtraRows()" style="width:100%; padding:8px 0; background:#f0f0f0; border:none; border-top:1px solid #ddd; border-bottom:1px dashed #ccc; cursor:pointer; font-size:12px; font-weight:600; color:#555; letter-spacing:0.3px;">&#9660; Show quantities 2–24</button></td></tr>`;
+    }
   }
 
-  document.getElementById("breakEven").innerText = document.getElementById("selectedQty").value === "" ? "-" : breakEvenCPA.toFixed(2);
-  document.getElementById("breakEvenROAS").innerText = document.getElementById("selectedQty").value === "" ? "-" : (breakEvenROAS ? breakEvenROAS.toFixed(2) + "x" : "-");
+  if (selectedQtyVal !== "" && parseInt(selectedQtyVal) > 1) {
+    tableExpanded = true;
+  }
+
+  document.querySelectorAll('.extra-qty-row').forEach(r => {
+    r.style.display = tableExpanded ? '' : 'none';
+  });
+  let btn = document.getElementById('expandBtn');
+  if (btn) btn.textContent = tableExpanded ? '▲ Hide quantities 2–24' : '▼ Show quantities 2–24';
+
+  document.getElementById("breakEven").innerText = selectedQtyVal === "" ? "-" : breakEvenCPA.toFixed(2);
+  document.getElementById("breakEvenROAS").innerText = selectedQtyVal === "" ? "-" : (breakEvenROAS ? breakEvenROAS.toFixed(2) + "x" : "-");
 }
 
-function getDiscountOptions(includeBXY) {
-  return includeBXY
-    ? `<option value="bxy">Buy X Get Y</option><option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`
-    : `<option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`;
-}
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("change", updateGroupHeaders);
+  el.addEventListener("change", handleVisibility);
+  el.addEventListener("input", update);
+});
+
+handleVisibility();
+updateGroupHeaders();
+update();
 
 function createDiscountBlock(type) {
   let containerId = type === "customer" ? "customerDiscountsContainer" : "supplierDiscountsContainer";
@@ -727,7 +900,6 @@ function createDiscountBlock(type) {
   let options = bxyExists
     ? `<option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`
     : `<option value="bxy">Buy X Get Y</option><option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`;
-
   return `
     <div class="${type}-discount">
       <label class="discount-type-label">Type</label>
@@ -744,29 +916,79 @@ function createDiscountBlock(type) {
       <div class="value-field">
         <input class="value" placeholder="Value">
       </div>
-      <div class="discount-btn-row">
-        <button class="btn-neutral" onclick="moveUp(this)">&#8593;</button>
-        <button class="btn-neutral" onclick="moveDown(this)">&#8595;</button>
-        <button class="btn-danger" onclick="removeDiscount(this)">Remove</button>
+      <div style="display:flex; gap:6px; margin:6px 0;">
+        <button onclick="moveUp(this)">↑</button>
+        <button onclick="moveDown(this)">↓</button>
+        <button onclick="removeDiscount(this)" style="color:red;">✕</button>
       </div>
+      <hr>
     </div>
   `;
 }
 
 function updateDiscountVisibility(container) {
-  container.querySelectorAll('.customer-discount, .supplier-discount').forEach(block => {
-    let type = block.querySelector('.type').value;
-    let bxyFields = block.querySelector('.bxy-fields');
-    let valueField = block.querySelector('.value-field');
-    let bxyType = block.querySelector('.bxyType')?.value;
-    if (type === 'bxy') {
-      bxyFields.style.display = 'block';
-      valueField.style.display = bxyType === 'free' ? 'none' : 'block';
+  container.querySelectorAll(".customer-discount, .supplier-discount").forEach(block => {
+    let type = block.querySelector(".type").value;
+    let bxyFields = block.querySelector(".bxy-fields");
+    let valueField = block.querySelector(".value-field");
+    let bxyType = block.querySelector(".bxyType")?.value;
+    if (type === "bxy") {
+      bxyFields.style.display = "block";
+      valueField.style.display = bxyType === "free" ? "none" : "block";
     } else {
-      bxyFields.style.display = 'none';
-      valueField.style.display = 'block';
+      bxyFields.style.display = "none";
+      valueField.style.display = "block";
     }
   });
+}
+
+document.addEventListener("change", function(e) {
+  if (e.target.classList.contains("bxyType")) { updateDiscountVisibility(document); runBXYEnforcement(); }
+  if (e.target.classList.contains("type")) { updateDiscountVisibility(document); runBXYEnforcement(); }
+});
+
+function addCustomerDiscount() {
+  document.getElementById("customerDiscountsContainer").insertAdjacentHTML("beforeend", createDiscountBlock("customer"));
+  updateDiscountVisibility(document);
+  runBXYEnforcement();
+}
+
+function addSupplierDiscount() {
+  document.getElementById("supplierDiscountsContainer").insertAdjacentHTML("beforeend", createDiscountBlock("supplier"));
+  updateDiscountVisibility(document);
+  runBXYEnforcement();
+}
+
+document.addEventListener("input", function(e) {
+  if (e.target.closest("#customerDiscountsContainer") || e.target.closest("#supplierDiscountsContainer")) {
+    updateGroupHeaders();
+    update();
+  }
+});
+
+function removeDiscount(btn) {
+  btn.closest('.customer-discount, .supplier-discount').remove();
+  updateGroupHeaders(); update(); runBXYEnforcement();
+}
+
+function moveUp(btn) {
+  let el = btn.closest('.customer-discount, .supplier-discount');
+  let prev = el.previousElementSibling;
+  if (prev) el.parentNode.insertBefore(el, prev);
+  updateGroupHeaders(); update(); runBXYEnforcement();
+}
+
+function moveDown(btn) {
+  let el = btn.closest('.customer-discount, .supplier-discount');
+  let next = el.nextElementSibling;
+  if (next) el.parentNode.insertBefore(next, el);
+  updateGroupHeaders(); update(); runBXYEnforcement();
+}
+
+function getDiscountOptions(includeBXY) {
+  return includeBXY
+    ? `<option value="bxy">Buy X Get Y</option><option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`
+    : `<option value="percent">% Discount</option><option value="fixed">Fixed Discount</option>`;
 }
 
 function enforceSingleBXY(containerId) {
@@ -779,80 +1001,23 @@ function enforceSingleBXY(containerId) {
     let currentValue = select.value;
     let shouldIncludeBXY = !bxyExists || currentValue === 'bxy';
     select.innerHTML = getDiscountOptions(shouldIncludeBXY);
-    if (shouldIncludeBXY || currentValue !== 'bxy') select.value = currentValue;
-    else select.value = 'percent';
+    if (shouldIncludeBXY || currentValue !== 'bxy') { select.value = currentValue; }
+    else { select.value = 'percent'; }
   });
 }
 
+document.addEventListener("change", function(e) {
+  if (e.target.classList.contains("type")) {
+    enforceSingleBXY("customerDiscountsContainer");
+    enforceSingleBXY("supplierDiscountsContainer");
+  }
+});
+
 function runBXYEnforcement() {
-  enforceSingleBXY('customerDiscountsContainer');
-  enforceSingleBXY('supplierDiscountsContainer');
+  enforceSingleBXY("customerDiscountsContainer");
+  enforceSingleBXY("supplierDiscountsContainer");
 }
-
-function addCustomerDiscount() {
-  document.getElementById('customerDiscountsContainer').insertAdjacentHTML('beforeend', createDiscountBlock('customer'));
-  updateDiscountVisibility(document);
-  runBXYEnforcement();
-}
-
-function addSupplierDiscount() {
-  document.getElementById('supplierDiscountsContainer').insertAdjacentHTML('beforeend', createDiscountBlock('supplier'));
-  updateDiscountVisibility(document);
-  runBXYEnforcement();
-}
-
-function removeDiscount(btn) {
-  btn.closest('.customer-discount, .supplier-discount').remove();
-  updateGroupHeaders();
-  update();
-  runBXYEnforcement();
-}
-
-function moveUp(btn) {
-  let el = btn.closest('.customer-discount, .supplier-discount');
-  let prev = el.previousElementSibling;
-  if (prev) el.parentNode.insertBefore(el, prev);
-  updateGroupHeaders();
-  update();
-  runBXYEnforcement();
-}
-
-function moveDown(btn) {
-  let el = btn.closest('.customer-discount, .supplier-discount');
-  let next = el.nextElementSibling;
-  if (next) el.parentNode.insertBefore(next, el);
-  updateGroupHeaders();
-  update();
-  runBXYEnforcement();
-}
-
-document.addEventListener('change', function(e) {
-  if (e.target.classList.contains('bxyType') || e.target.classList.contains('type')) {
-    updateDiscountVisibility(document);
-    runBXYEnforcement();
-  }
-  if (e.target.classList.contains('type')) {
-    enforceSingleBXY('customerDiscountsContainer');
-    enforceSingleBXY('supplierDiscountsContainer');
-  }
-});
-
-document.addEventListener('input', function(e) {
-  if (e.target.closest('#customerDiscountsContainer') || e.target.closest('#supplierDiscountsContainer')) {
-    updateGroupHeaders();
-    update();
-  }
-});
-
-document.querySelectorAll('input, select').forEach(el => {
-  el.addEventListener('change', updateGroupHeaders);
-  el.addEventListener('change', handleVisibility);
-  el.addEventListener('input', update);
-});
-
-handleVisibility();
-updateGroupHeaders();
-update();
 </script>
+
 </body>
 </html>

@@ -853,7 +853,7 @@ function update() {
       <td style="color:green; background:${hasCustShip ? "#e6ffe6" : "#f7f7f7"} !important;">${display(shippingRevenue, hasCustShip)}</td>
       <td style="color:gray; background:#f2f2f2;">${display(revenueBeforeDiscounts, hasAnyRevenue)}</td>
       <td style="color:green; font-weight:bold; background:${hasAnyRevenue ? "#e6ffe6" : "#f7f7f7"} !important;">${display(revenue, hasAnyRevenue)}</td>
-      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${document.getElementById("taxRate").value === "" ? "#f7f7f7" : (taxIncluded ? "white" : "#f2f2f2")}; font-weight:normal;">${document.getElementById("taxRate").value === "" ? "" : display(taxIncluded ? taxValue : revenueWithTax, hasAnyRevenue)}</td>
+      <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${document.getElementById("taxRate").value === "" ? "#f7f7f7" : (taxIncluded ? "#ffe6e6" : "#f2f2f2")}; font-weight:normal;">${document.getElementById("taxRate").value === "" ? "" : display(taxIncluded ? taxValue : revenueWithTax, hasAnyRevenue)}</td>
       <td style="color:red; background:${hasCost ? "#ffe6e6" : "#f7f7f7"} !important;">${display(productCost, hasCost)}</td>
       <td style="color:red; background:${hasYourShip ? "#ffe6e6" : "#f7f7f7"} !important;">${display(shippingCost, hasYourShip)}</td>
       <td style="color:red; background:${hasFulfilment ? "#ffe6e6" : "#f7f7f7"} !important;">${display(fulfilmentCost, hasFulfilment)}</td>

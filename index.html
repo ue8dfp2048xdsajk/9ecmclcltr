@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ecom Profit Calculator</title>
+<title>Most Accurate POD Profit Calculator by Tia TX ©</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -541,7 +541,7 @@ tbody td:first-child {
 
 <div class="container">
   <div class="header">
-    <h1>Ecom Profit Calculator by Tia TX ©</h1>
+    <h1>Most Accurate POD Profit Calculator by Tia TX ©</h1>
     <div class="subtitle">Analyze margins and costs across order quantities to check profit before selling a product.</div>
   </div>
 
@@ -708,6 +708,23 @@ tbody td:first-child {
 </div>
 
 <script>
+/* DISABLE RIGHT CLICK */
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+/* DISABLE DEVTOOLS SHORTCUTS */
+document.onkeydown = function(e) {
+  if (
+    e.keyCode === 123 ||
+    (e.ctrlKey && e.shiftKey && e.keyCode === 73) ||
+    (e.ctrlKey && e.shiftKey && e.keyCode === 74) ||
+    (e.ctrlKey && e.shiftKey && e.keyCode === 67) ||
+    (e.ctrlKey && e.keyCode === 85) ||
+    (e.ctrlKey && e.keyCode === 83)
+  ) {
+    return false;
+  }
+};
+
 function calcBatchCost(n, costSingle, costBatch, batchSize) {
   let batchEnabled = document.getElementById("enableBatch")?.checked;
   if (!batchEnabled) { return n * costSingle; }

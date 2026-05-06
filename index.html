@@ -451,6 +451,77 @@ tbody td:first-child {
   opacity: 1;
 }
 
+/* Instructions panel */
+#instructionsPanel {
+  margin-top: 20px;
+  background: #f8fffe;
+  border: 1px solid #b2dfdb;
+  border-radius: 12px;
+  padding: 22px 24px;
+  font-size: 13px;
+  color: #263238;
+  line-height: 1.65;
+}
+
+#instructionsPanel h3 {
+  margin: 0 0 14px 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #00695c;
+  border-bottom: 1px solid #b2dfdb;
+  padding-bottom: 8px;
+}
+
+#instructionsPanel ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+#instructionsPanel li {
+  margin-bottom: 10px;
+}
+
+#instructionsPanel li:last-child {
+  margin-bottom: 0;
+}
+
+#instructionsPanel strong {
+  color: #00695c;
+  font-weight: 600;
+}
+
+#instructionsPanel .optional-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #546e7a;
+  background: #e0f2f1;
+  border-radius: 4px;
+  padding: 1px 7px;
+  margin-bottom: 8px;
+  margin-top: 4px;
+}
+
+#instructionsPanel .quick-links {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #546e7a;
+}
+
+#instructionsPanel .quick-links a {
+  color: #00897b;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+#instructionsPanel .quick-links a:hover {
+  text-decoration: underline;
+}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #f5f5f5; }
 ::-webkit-scrollbar-thumb { background: #b2dfdb; border-radius: 3px; }
@@ -616,6 +687,22 @@ tbody td:first-child {
         </thead>
         <tbody></tbody>
       </table>
+
+      <div id="instructionsPanel">
+        <h3>How to use</h3>
+        <ol>
+          <li><strong>Enter your base costs</strong><br>Add your unit cost (from your supplier) and your shipping costs (first + additional items). You can get both directly from your supplier.</li>
+          <li><strong>Set your pricing</strong><br>Enter how much you'll charge per unit and for customer shipping. This is where you control your margins.<br><span style="color:#00695c; font-weight:700; background:#d4f5ee; border-radius:4px; padding:1px 7px; font-size:13.5px;">You'll instantly see your profit!</span></li>
+        </ol>
+        <div class="optional-label">Optional</div>
+        <ol start="3">
+          <li><strong>Add fees</strong><br>Include platform fees, fulfilment, inventory costs, and tax if needed.<br>
+            <span class="quick-links">Quick links: <a href="https://www.etsy.com/sell" target="_blank" rel="noopener">Etsy</a>, <a href="https://sellercentral.amazon.com" target="_blank" rel="noopener">Amazon (FBM/FBA)</a>, <a href="https://www.ebay.com/sell" target="_blank" rel="noopener">eBay</a>, <a href="https://www.shopify.com/pricing" target="_blank" rel="noopener">Shopify</a></span>
+          </li>
+          <li><strong>Add discounts</strong><br>Test customer offers or enter supplier discounts (including batch) to see how they impact margins at different quantities.</li>
+          <li><strong>Add ads info</strong><br>Enter your target CPA and select an expected order quantity (at target AOV) to see your max CPA and break-even ROAS.</li>
+        </ol>
+      </div>
     </div>
   </div>
 </div>
@@ -667,6 +754,13 @@ function updateGroupHeaders() {
 
 let tableExpanded = false;
 
+function updateInstructionsVisibility() {
+  let panel = document.getElementById('instructionsPanel');
+  if (panel) {
+    panel.style.display = tableExpanded ? 'none' : 'block';
+  }
+}
+
 function toggleExtraRows() {
   tableExpanded = !tableExpanded;
   document.querySelectorAll('.extra-qty-row').forEach(r => {
@@ -674,6 +768,7 @@ function toggleExtraRows() {
   });
   let btn = document.getElementById('expandBtn');
   if (btn) btn.textContent = tableExpanded ? '▲ Hide quantities 2–24' : '▼ Show quantities 2–24';
+  updateInstructionsVisibility();
 }
 
 function update() {
@@ -882,6 +977,8 @@ function update() {
 
   document.getElementById("breakEven").innerText = selectedQtyVal === "" ? "-" : breakEvenCPA.toFixed(2);
   document.getElementById("breakEvenROAS").innerText = selectedQtyVal === "" ? "-" : (breakEvenROAS ? breakEvenROAS.toFixed(2) + "x" : "-");
+
+  updateInstructionsVisibility();
 }
 
 document.querySelectorAll("input, select").forEach(el => {

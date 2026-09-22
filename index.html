@@ -591,10 +591,13 @@ tbody td:first-child {
       <input id="fulfilmentPerUnit" placeholder="e.g. 5.20">
 
       <h3>Tax</h3>
-      <label>Tax rate (%)</label>
+      <label>Customer tax rate (%)</label>
       <input id="taxRate" value="" placeholder="e.g. 20">
       <label style="color:red;"><input type="checkbox" id="taxIncluded"> Tax already included in price</label>
       <label><input type="checkbox" id="includeShippingInTax" checked> Include shipping in tax</label>
+      <label style="color:red;">Supplier tax rate (%)</label>
+      <input id="supplierTaxRate" value="" placeholder="e.g. 20">
+      <label><input type="checkbox" id="includeShippingInSupplierTax" checked> Include shipping in supplier tax</label>
 
       <h3>Ads</h3>
       <label>Estimated CPA</label>
@@ -658,7 +661,7 @@ tbody td:first-child {
           <tr>
             <th style="background:transparent;border:none;"></th>
             <th id="revGroup" colspan="5" style="background:#e6ffe6; color:green;">Revenue</th>
-            <th id="costGroup" colspan="5" style="background:#ffe6e6; color:red;">Costs</th>
+            <th id="costGroup" colspan="6" style="background:#ffe6e6; color:red;">Costs</th>
             <th id="profitGroup" colspan="3" style="background:#fff3cd; color:#b8860b;">Profit / Loss</th>
           </tr>
           <tr>
@@ -677,6 +680,7 @@ tbody td:first-child {
             <th id="taxHeader" style="color:purple; font-weight:normal;">Revenue with Tax</th>
             <th style="color:red; font-weight:normal;">Item Cost</th>
             <th style="color:red; font-weight:normal;">Shipping Cost</th>
+            <th style="color:red; font-weight:normal;">Supplier Tax</th>
             <th style="color:red; font-weight:normal;">Fulfilment &amp; Storage Fees</th>
             <th style="color:red;">Total Cost (COGS)</th>
             <th style="color:red; font-weight:normal;">Platform Fees</th>
@@ -763,8 +767,8 @@ function updateGroupHeaders() {
   let profit = document.getElementById("profitGroup");
   let taxIncluded = document.getElementById("taxIncluded")?.checked;
   if (rev && cost && profit) {
-    if (taxIncluded) { rev.colSpan = 4; cost.colSpan = 6; }
-    else { rev.colSpan = 5; cost.colSpan = 5; }
+    if (taxIncluded) { rev.colSpan = 4; cost.colSpan = 7; }
+    else { rev.colSpan = 5; cost.colSpan = 6; }
     profit.colSpan = 3;
   }
 }
@@ -820,9 +824,10 @@ function update() {
   let hasCustShip = document.getElementById("shipCustomerFirst").value !== "" || document.getElementById("shipCustomerExtra").value !== "";
   let hasYourShip = document.getElementById("shipFirst").value !== "" || document.getElementById("shipExtra").value !== "";
   let hasFulfilment = document.getElementById("fulfilmentPerUnit").value !== "";
+  let hasSupplierTax = document.getElementById("supplierTaxRate").value !== "";
   let hasFees = document.getElementById("platformFeePercent").value !== "" || document.getElementById("processorFeePercent").value !== "" || document.getElementById("fixedFee").value !== "";
   let hasAnyRevenue = hasPrice || hasCustShip;
-  let hasAnyCost = hasCost || hasYourShip || hasFulfilment;
+  let hasAnyCost = hasCost || hasYourShip || hasFulfilment || hasSupplierTax;
 
   let selectedQtyVal = document.getElementById("selectedQty").value.trim();
   let selectedQty = selectedQtyVal !== "" ? parseInt(selectedQtyVal) : null;
@@ -935,7 +940,13 @@ function update() {
     let fulfilmentCost = n * fulfilmentPerUnit;
 
     productCost = Math.max(0, productCost);
-    let totalCost = productCost + shippingCost + fulfilmentCost;
+
+    let supplierTaxRate = (parseFloat(document.getElementById("supplierTaxRate").value) || 0) / 100;
+    let includeShippingInSupplierTax = document.getElementById("includeShippingInSupplierTax").checked;
+    let supplierTaxBase = productCost + (includeShippingInSupplierTax ? shippingCost : 0);
+    let supplierTax = supplierTaxBase * supplierTaxRate;
+
+    let totalCost = productCost + shippingCost + fulfilmentCost + supplierTax;
     let profit = revenue - totalCost - totalFees;
     if (taxIncluded) { profit -= taxValue; }
     let profitAfterAds = profit - cpa;
@@ -949,13 +960,13 @@ function update() {
       breakEvenROAS = breakEvenCPA > 0 ? revenue / breakEvenCPA : null;
     }
 
-    rows.push({ n, goodsRevenue, shippingRevenue, revenueBeforeDiscounts, revenue, taxIncluded, taxValue, revenueWithTax, productCost, shippingCost, fulfilmentCost, totalCost, totalFees, profit, profitAfterAds, profitMargin });
+    rows.push({ n, goodsRevenue, shippingRevenue, revenueBeforeDiscounts, revenue, taxIncluded, taxValue, revenueWithTax, productCost, shippingCost, supplierTax, fulfilmentCost, totalCost, totalFees, profit, profitAfterAds, profitMargin });
   }
 
   // Second pass: render rows with correct highlight
   let colCount = tbody.closest('table').querySelectorAll('thead tr:last-child th').length;
   for (let i = 0; i < rows.length; i++) {
-    let { n, goodsRevenue, shippingRevenue, revenueBeforeDiscounts, revenue, taxIncluded, taxValue, revenueWithTax, productCost, shippingCost, fulfilmentCost, totalCost, totalFees, profit, profitAfterAds, profitMargin } = rows[i];
+    let { n, goodsRevenue, shippingRevenue, revenueBeforeDiscounts, revenue, taxIncluded, taxValue, revenueWithTax, productCost, shippingCost, supplierTax, fulfilmentCost, totalCost, totalFees, profit, profitAfterAds, profitMargin } = rows[i];
     let isSelected = selectedQty !== null && n === selectedQty;
     let extraClass = n > 1 ? 'extra-qty-row' : '';
     let highlightClass = profit === bestProfit ? 'highlight' : '';
@@ -968,6 +979,7 @@ function update() {
       <td style="color:${taxIncluded ? 'red' : 'gray'}; background:${document.getElementById("taxRate").value === "" ? "#f7f7f7" : (taxIncluded ? "#ffe6e6" : "#f2f2f2")}; font-weight:normal;">${document.getElementById("taxRate").value === "" ? "" : display(taxIncluded ? taxValue : revenueWithTax, hasAnyRevenue)}</td>
       <td style="color:red; background:${hasCost ? "#ffe6e6" : "#f7f7f7"} !important;">${display(productCost, hasCost)}</td>
       <td style="color:red; background:${hasYourShip ? "#ffe6e6" : "#f7f7f7"} !important;">${display(shippingCost, hasYourShip)}</td>
+      <td style="color:red; background:${hasSupplierTax ? "#ffe6e6" : "#f7f7f7"} !important;">${display(supplierTax, hasSupplierTax)}</td>
       <td style="color:red; background:${hasFulfilment ? "#ffe6e6" : "#f7f7f7"} !important;">${display(fulfilmentCost, hasFulfilment)}</td>
       <td style="color:red; font-weight:bold; background:${hasAnyCost ? "#ffe6e6" : "#f7f7f7"} !important;">${display(totalCost, hasAnyCost)}</td>
       <td style="color:red; background:${hasFees ? "#ffe6e6" : "#f7f7f7"} !important;">${display(totalFees, hasFees)}</td>
